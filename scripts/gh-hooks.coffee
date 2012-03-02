@@ -12,8 +12,10 @@ module.exports = (robot) ->
   robot.router.post '/hubot/gh-hooks/push', (req, res) ->
     req.body = req.body || {}
 
-    if req.body.payload
-      payload = JSON.parse(req.body.payload)
+    robot.logger.debug req.body
+
+    if req.body['payload']
+      payload = JSON.parse(req.body['payload'])
 
       pusher = payload.pusher
       head = payload.head_commit
