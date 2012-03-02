@@ -13,7 +13,7 @@ module.exports = (robot) ->
     for k of req
       robot.logger.debug "\t#{k}: #{req[k]}"
     for k of req.body
-      robot.logger.debug "\t#{k}: #{body[k]}"
+      robot.logger.debug "\t#{k}: #{req.body[k]}"
     robot.logger.debug "body: #{req.body}"
     robot.logger.debug "req: #{req}"
     buf = ''
