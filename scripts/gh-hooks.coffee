@@ -10,7 +10,7 @@ module.exports = (robot) ->
 
 
   thing = robot
-  @connect.use @connect.logger()
+  robot.connect.use robot.connect.logger()
   robot.router.post '/hubot/gh-hooks', (req, res) ->
     thing.logger.debug req
     thing.logger.debug req.body
