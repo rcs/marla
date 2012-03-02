@@ -21,7 +21,7 @@ module.exports = (robot) ->
       repo = req.body.repository
       first = req.body.commits[0]
 
-      branch = first.ref.replace(/^refs\/head\//,'')
+      branch = req.body.ref.replace(/^refs\/head\//,'')
 
       robot.logger.debug "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
       robot.logger.debug "#{head.author.username}: #{head.id.substring(0,7)} #{head.message} #{head.url}"
