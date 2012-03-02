@@ -9,10 +9,10 @@ module.exports = (robot) ->
     robot.brain.data.gh-hooks = {}
 
   robot.router.post '/hubot/gh-hooks', (req, res) ->
-    for k of robot
+    robot.logger.debug req.body
+    for own k of robot
       robot.logger.debug "\t#{k}: #{robot[k]}"
 
-    robot.logger.debug req.body
     res.end "done"
 
   robot.respond /gh-hooks add (.*) (push)/, (msg) ->
