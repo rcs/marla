@@ -15,22 +15,21 @@ module.exports = (robot) ->
     robot.logger.debug "#{req.body}"
     robot.logger.debug "#{req.body.payload}"
 
-    if req.body['payload']
-      payload = JSON.parse(req.body['payload'])
+    if req.body.pusher
 
-      pusher = payload.pusher
-      head = payload.head_commit
-      repo = payload.repository
-      first = payload.commits[0]
+      pusher = req.body.pusher
+      head = req.body.head_commit
+      repo = req.body.repository
+      first = req.body.commits[0]
 
       branch = first.ref.replace(/^refs\/head\//,'')
 
       msg = []
-      msg.push "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{payload.compare}"
+      msg.push "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
       msg.push "#{head.author.username}: #{head.id.substring(0,7)} #{head.message} #{head.url}"
 
-      if payload.commits.length > 1
-        msg.push "#{payload.commits.length -1} more commits #{payload.compare}"
+      if req.body.commits.length > 1
+        msg.push "#{req.body.commits.length -1} more commits #{payload.compare}"
 
       for s in msg
         robot.logger.debug s
