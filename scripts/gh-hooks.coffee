@@ -1,10 +1,20 @@
 # Subscribe to github events
 # Requires HUBOT_URL="...your_url..." to be set
+# requires github-credentials
 
 
 
 module.exports = (robot) ->
-  robot.respond /hub-hooker (.*) (push)/, (msg) ->
+  robot.brain.on 'loaded', =>
+    robot.brain.data.gh-hooks = {}
+
+  robot.router.post '/hubot/gh-hooks', (req, res) ->
+    robot.messageRoom(room, JSON.stringify(req)) for room in robot.rooms
+
+  robot.respond /gh-hooks add (.*) (push)/, (msg) ->
+
+
+    robot.brain.data.gh-hooks
     for k of msg
       robot.logger.debug "#{k}: #{msg[k]}"
 
