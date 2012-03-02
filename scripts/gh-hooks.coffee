@@ -9,7 +9,7 @@ module.exports = (robot) ->
     robot.brain.data.gh-hooks = {}
 
 
-  robot.router.post '/hubot/gh-hooks', (req, res) ->
+  robot.router.post '/hubot/gh-hooks.json', (req, res) ->
     req.body = req.body || {}
 
     robot.logger.debug "Parsed body: #{JSON.stringify req.body}"
