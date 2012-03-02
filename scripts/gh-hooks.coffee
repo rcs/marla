@@ -9,15 +9,11 @@ module.exports = (robot) ->
     robot.brain.data.gh-hooks = {}
 
 
-  thing = robot
-  robot.connect.use robot.connect.logger()
   robot.router.post '/hubot/gh-hooks', (req, res) ->
-    thing.logger.debug req
-    thing.logger.debug req.body
-
     buf = ''
     req.on 'data', (chunk) -> 
       buf += chunk
+      robot.logger.debug buf
 
     req.on 'end', ->
       req.body = JSON.parse(buf);
