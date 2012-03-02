@@ -9,7 +9,7 @@ module.exports = (robot) ->
     robot.brain.data.gh-hooks = {}
 
   robot.router.post '/hubot/gh-hooks', (req, res) ->
-    robot.messageRoom(room, JSON.stringify(req)) for room in robot.rooms
+    robot.logger.debug JSON.stringify(req)
     res.end "done"
 
   robot.respond /gh-hooks add (.*) (push)/, (msg) ->
