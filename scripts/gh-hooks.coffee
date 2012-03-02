@@ -16,13 +16,15 @@ module.exports = (robot) ->
       robot.logger.debug "\t#{k}: #{req.body[k]}"
     robot.logger.debug "body: #{req.body}"
     robot.logger.debug "req: #{req}"
-    buf = ''
+
     req.on 'data', (chunk) -> 
+      robot.logger.debug "I HATE THINGS"
       buf += chunk
-      robot.logger.debug buf
+      robot.logger.debug "Buf: #{buf}"
 
     req.on 'end', ->
-      req.body = JSON.parse(buf);
+      robot.logger.debug "I HATE THINGS SO VERY VERY MCH"
+      req.body = JSON.parse(buf)
 
       res.end buf
 
