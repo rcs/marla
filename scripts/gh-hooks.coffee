@@ -10,6 +10,8 @@ module.exports = (robot) ->
 
 
   robot.router.post '/hubot/gh-hooks', (req, res) ->
+    robot.logger.debug "body: #{req.body}"
+    robot.logger.debug req._body
     buf = ''
     req.on 'data', (chunk) -> 
       buf += chunk
