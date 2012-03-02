@@ -10,26 +10,11 @@ module.exports = (robot) ->
 
 
   robot.router.post '/hubot/gh-hooks', (req, res) ->
-    robot.logger.debug "req body is #{typeof req.body}"
-    robot.logger.debug "req"
-    for k of req
-      robot.logger.debug "r: \t#{k}: #{req[k]}"
-    robot.logger.debug "Body"
-    for k of req.body
-      robot.logger.debug "b: \t#{k}: #{req.body[k]}"
-    robot.logger.debug "body: #{req.body}"
-    robot.logger.debug "req: #{req}"
+    req.body = req.body || {}
 
-    req.on 'data', (chunk) -> 
-      robot.logger.debug "I HATE THINGS"
-      buf += chunk
-      robot.logger.debug "Buf: #{buf}"
+    robot.logger.debug "Parsed body: #{JSON.stringify req.body}"
 
-    req.on 'end', ->
-      robot.logger.debug "I HATE THINGS SO VERY VERY MCH"
-      req.body = JSON.parse(buf)
-
-      res.end buf
+    res.end ok
 
   robot.respond /gh-hooks add (.*) (push)/, (msg) ->
 
