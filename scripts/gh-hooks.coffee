@@ -10,6 +10,7 @@ module.exports = (robot) ->
 
   robot.router.post '/hubot/gh-hooks', (req, res) ->
     robot.messageRoom(room, JSON.stringify(req)) for room in robot.rooms
+    res.end "done"
 
   robot.respond /gh-hooks add (.*) (push)/, (msg) ->
 
