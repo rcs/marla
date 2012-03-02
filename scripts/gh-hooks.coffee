@@ -15,7 +15,14 @@ module.exports = (robot) ->
     thing.logger.debug req
     thing.logger.debug req.body
 
-    res.end "ok"
+    buf = ''
+    req.on 'data', (chunk) -> 
+      buf += chunk
+
+    req.on 'end', ->
+      req.body = JSON.parse(buf);
+
+      res.end buf
 
   robot.respond /gh-hooks add (.*) (push)/, (msg) ->
 
