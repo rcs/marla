@@ -8,7 +8,9 @@ module.exports = (robot) ->
   robot.brain.on 'loaded', =>
     robot.brain.data.gh-hooks = {}
 
+
   thing = robot
+  @connect.use @connect.logger()
   robot.router.post '/hubot/gh-hooks', (req, res) ->
     thing.logger.debug req
     thing.logger.debug req.body
