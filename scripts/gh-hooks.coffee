@@ -12,9 +12,6 @@ module.exports = (robot) ->
   robot.router.post '/hubot/gh-hooks/push', (req, res) ->
     req.body = req.body || {}
 
-    robot.logger.debug "#{req.body}"
-    robot.logger.debug "#{req.body.payload}"
-
     if req.body.pusher
 
       pusher = req.body.pusher
@@ -24,15 +21,12 @@ module.exports = (robot) ->
 
       branch = first.ref.replace(/^refs\/head\//,'')
 
-      msg = []
-      msg.push "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
-      msg.push "#{head.author.username}: #{head.id.substring(0,7)} #{head.message} #{head.url}"
+      robot.logger.debug "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
+      robot.logger.debug "#{head.author.username}: #{head.id.substring(0,7)} #{head.message} #{head.url}"
 
       if req.body.commits.length > 1
-        msg.push "#{req.body.commits.length -1} more commits #{payload.compare}"
+        robot.logger.debug "#{req.body.commits.length -1} more commits #{payload.compare}"
 
-      for s in msg
-        robot.logger.debug s
 
     res.end "ok"
 
