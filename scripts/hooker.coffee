@@ -11,5 +11,8 @@ module.exports = (robot) ->
     robot.logger.debug "Message:"
     for k of msg.message
       robot.logger.debug "\t#{k}: #{msg.message[k]}"
+    robot.logger.debug "User:"
+    for k of msg.message.user
+      robot.logger.debug "\t#{k}: #{msg.message.user[k]}"
     msg.reply "Subscribing to #{msg.match[2]} events for #{msg.match[1]}"
 
