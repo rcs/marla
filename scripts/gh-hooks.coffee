@@ -12,6 +12,8 @@ module.exports = (robot) ->
   robot.router.post '/hubot/gh-hooks/push', (req, res) ->
     req.body = req.body || {}
 
+    robot.logger.debug JSON.stringify(req.body)
+
     if req.body.pusher
 
       pusher = req.body.pusher
@@ -24,8 +26,8 @@ module.exports = (robot) ->
       robot.logger.debug "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
       robot.logger.debug "#{head.author.username}: #{head.id.substring(0,7)} #{head.message} #{head.url}"
 
-      if req.body.commits.length > 1
-        robot.logger.debug "#{req.body.commits.length -1} more commits #{payload.compare}"
+      #if req.body.commits.length > 1
+      #  robot.logger.debug "#{req.body.commits.length -1} more commits #{payload.compare}"
 
 
     res.end "ok"
