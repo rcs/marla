@@ -9,12 +9,30 @@ module.exports = (robot) ->
     robot.brain.data.gh-hooks = {}
 
 
-  robot.router.post '/hubot/gh-hooks.json', (req, res) ->
+  robot.router.post '/hubot/gh-hooks/push', (req, res) ->
     req.body = req.body || {}
 
-    robot.logger.debug "Parsed body: #{JSON.stringify req.body}"
+    if req.body.payload
+      payload = JSON.parse(req.body.payload)
 
-    res.end ok
+      pusher = payload.pusher
+      head = payload.head_commit
+      repo = payload.repository
+      first = payload.commits[0]
+
+      branch = first.ref.replace(/^refs\/head\//,'')
+
+      msg = []
+      msg.push "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{payload.compare}"
+      msg.push "#{head.author.username}: #{head.id.substring(0,7)} #{head.message} #{head.url}"
+
+      if payload.commits.length > 1
+        msg.push "#{payload.commits.length -1} more commits #{payload.compare}"
+
+      for s in msg
+        robot.logger.debug s
+
+    res.end "ok"
 
   robot.respond /gh-hooks add (.*) (push)/, (msg) ->
 
