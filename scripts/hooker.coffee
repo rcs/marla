@@ -7,5 +7,5 @@ module.exports = (robot) ->
   robot.respond /hub-hooker (.*) (push)/, (msg) ->
     robot.logger.debug "Message:"
     robot.logger.debug "\t#{a}: #{msg[a]}" for a in msg
-    msg.reply "Subscribing to #{match[2]} events for #{match[1]}"
+    msg.reply "Subscribing to #{msg.match[2]} events for #{msg.match[1]}"
 
