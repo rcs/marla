@@ -10,8 +10,6 @@ module.exports = (robot) ->
 
   robot.router.post '/hubot/gh-hooks', (req, res) ->
     robot.logger.debug req.body
-    for own k of robot
-      robot.logger.debug "\t#{k}: #{robot[k]}"
 
     res.end "done"
 
