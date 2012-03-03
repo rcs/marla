@@ -133,23 +133,23 @@ module.exports = (robot) ->
     return res.end "ok" unless req.body.repository # Not something we care about. Who does this?
 
     event = req.params.event
+    repo_name =  req.body.repository.owner.name + "/" + req.body.repository.name
 
-
-    context = _.extend req.body,
-      repo: req.body.repository
-      repo_name: req.body.repository.owner.name + "/" + req.body.repository.name
-      branch: if req.body.ref
-          req.body.ref.replace(/^refs\/heads\//,'')
-        else
-          undefined
 
     if views[event]
+      context = _.extend req.body,
+        repo: req.body.repository
+        repo_name: repo_name
+        branch: if req.body.ref
+            req.body.ref.replace(/^refs\/heads\//,'')
+          else
+            undefined
       template = Handlebars.compile(views['push'])
       message = template(context)
     else
-      message = JSON.stringify event: body
+      message = JSON.stringify event: req.body
 
-    listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name][event] || []
+    listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
 
     for listener in listeners when listener
       robot.send listener, message.split("\n")...
