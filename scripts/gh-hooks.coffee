@@ -141,7 +141,7 @@ module.exports = (robot) ->
 
       context = _.extend req.body,
         repo: req.body.repository
-        repo_name: req.body.repository.owner.name + "/" + repo.body.repository.name
+        repo_name: req.body.repository.owner.name + "/" + req.body.repository.name
         branch: if req.body.ref
             req.body.ref.replace(/^refs\/heads\//,'')
           else
@@ -151,12 +151,12 @@ module.exports = (robot) ->
       message = Handlebars.compile(views['push']).template(context)
       robot.logger.debug message
 
-      listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name]['push'] || []
+      listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name]['push'] || []
 
       for listener in listeners when listener
         robot.send listener, message
 
-      robot.logger.debug "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
+      robot.logger.debug "#{pusher.name} pushed to #{branch} at #{req.body.repository.owner.name}/#{req.body.respository.name} #{req.body.compare}"
       robot.logger.debug "#{head.author.username}: #{head.id.substring(0,7)} #{head.message}"
 
       if req.body.commits.length > 1
