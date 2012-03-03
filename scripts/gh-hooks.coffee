@@ -134,13 +134,14 @@ module.exports = (robot) ->
 
       pusher = req.body.pusher
       head = req.body.head_commit
-      repo = req.body.repository.name + "/" + req.body.repository.owner.name
+      repo = req.body.repository
+      repo_name = repo.owner.name + "/" + repo.name
       first = req.body.commits[0]
 
       branch = req.body.ref.replace(/^refs\/head\//,'')
 
-      robot.logger.debug "Finding #{repo}"
-      listeners = robot.brain.data.gh_hooks[req.params.github]?[repo]['push'] || []
+      robot.logger.debug "Finding #{repo_name}"
+      listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name]['push'] || []
 
       for listener in listeners when listener
         robot.send listener, "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
