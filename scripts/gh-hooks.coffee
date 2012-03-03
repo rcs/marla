@@ -74,6 +74,7 @@ module.exports = (robot) ->
 
     add_listener = ->
       robot.logger.debug "Adding listener"
+      robot.logger.debug JSON.stringify robot.brain.data.gh_hooks
       if ! robot.brain.data.gh_hooks[github_url][repo][event].some((elem) ->
         _.isEqual(elem,msg.user)
       )
