@@ -6,6 +6,12 @@
 # PREFIX_URL  : The place where this hubot is mounted (ex "http//hubot.example.com"
 # GITHUB_USER : The github user to use for the API
 # GITHUB_USER : The password to use for the API
+#
+#
+
+# TODO: add commit_comment support -- requires a round-trip to github to get the commit
+#
+#
 
 QS = require 'querystring'
 Handlebars = require 'handlebars'
