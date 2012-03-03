@@ -9,7 +9,9 @@
 #
 #
 
-# TODO: add commit_comment support -- requires a round-trip to github to get the commit
+# TODO: 
+# add commit_comment support -- requires a round-trip to github to get the commit
+# add pull_request support -- helpers necessary for opened/closed/synchronized display --- Sub templates? :-( (Not so bad, can switch on "action", thanks GH!")
 #
 #
 
@@ -174,7 +176,6 @@ module.exports = (robot) ->
       message = template(context)
     else
       robot.logger.debug "Template not found, pushing out lameness"
-      robot.logger.debug JSON.stringify req.body
       message = {}
       message[event] = req.body
       message = JSON.stringify message
