@@ -14,7 +14,7 @@ views =
   push:
     """
       [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}"
-      {{#each commits}}  {{author.username}}: {{commit.id}} {{commit.message}}
+      {{#each commits}}  {{author.username}}: {{id}} {{message}}
       {{/each}}
     """
 
@@ -149,6 +149,8 @@ module.exports = (robot) ->
           else
             undefined
 
+      robot.logger.debug JSON.stringify context
+
 
       template = Handlebars.compile(views['push'])
       message = template(context)
@@ -158,12 +160,5 @@ module.exports = (robot) ->
 
       for listener in listeners when listener
         robot.send listener, message
-
-      robot.logger.debug "#{pusher.name} pushed to #{branch} at #{req.body.repository.owner.name}/#{req.body.respository.name} #{req.body.compare}"
-      robot.logger.debug "#{head.author.username}: #{head.id.substring(0,7)} #{head.message}"
-
-      if req.body.commits.length > 1
-        robot.logger.debug "#{req.body.commits.length - 1} more commits #{payload.compare}"
-
 
     res.end "ok"
