@@ -19,6 +19,10 @@ views =
       {{#each commits}}  {{author.username}}: {{id}} {{message}}
       {{/each}}
     """
+  issue:
+    """
+      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} {{html_url}}
+    """
 
 module.exports = (robot) ->
   _ = require('underscore')
@@ -133,7 +137,7 @@ module.exports = (robot) ->
     return res.end "ok" unless req.body.repository # Not something we care about. Who does this?
 
     event = req.params.event
-    repo_name =  req.body.repository.owner.name + "/" + req.body.repository.name
+    repo_name =  (req.body.repository.owner.login || req.body.repository.owner.name) + "/" + req.body.repository.name
 
 
     robot.logger.debug "Finding event #{event} in views"
