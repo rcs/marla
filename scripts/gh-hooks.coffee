@@ -60,7 +60,7 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 200
-              delete robot.brain.data.gh_hooks[github_url][repo]
+              delete robot.brain.data.gh_hooks[github_url][repo][event]
               msg.send "Removed my subscription to #{repo} #{event} events"
             else
               msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
@@ -100,7 +100,8 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 204
-              site[repo] = []
+              repo = site[repo] ||= {}
+              events = repo[event] ||= []
               robot.logger.debug "Adding listener"
               msg.send "Adding you as a listener"
               add_listener()
@@ -112,7 +113,7 @@ module.exports = (robot) ->
 
 
   robot.brain.on 'loaded', =>
-    robot.brain.data.gh_hooks = {}
+    robot.brain.data.gh_hooks ||= {}
 
 
   robot.router.post '/hubot/gh_hooks/:github/push', (req, res) ->
