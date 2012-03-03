@@ -8,6 +8,7 @@
 # GITHUB_USER : The password to use for the API
 
 QS = require 'querystring'
+Handlebars = require 'handlebars'
 
 templates =
   push:
