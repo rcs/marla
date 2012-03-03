@@ -91,7 +91,8 @@ module.exports = (robot) ->
       robot.logger.debug ".auth('#{process.env.HUBOT_GITHUB_USER}','#{process.env.HUBOT_GITHUB_PASSWORD}')"
       msg.http("https://api.#{github_url}")
         .path('/hub')
-        .auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
+        .header('Authorization', 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64'))
+        #.auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 200
