@@ -139,7 +139,7 @@ module.exports = (robot) ->
 
       branch = req.body.ref.replace(/^refs\/head\//,'')
 
-      listeners = robot.brain.gh_hooks[req.params.github]?[repo]['push'] || []
+      listeners = robot.brain.data.gh_hooks[req.params.github]?[repo]['push'] || []
 
       for listener in listeners
         robot.send listener, "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
