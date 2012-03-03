@@ -60,6 +60,7 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 200
+              delete robot.brain.data.gh_hooks[github_url][repo]
               msg.send "Removed my subscription to #{repo} #{event} events"
             else
               msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
@@ -72,6 +73,7 @@ module.exports = (robot) ->
     msg.send "Subscribing to #{repo} #{event} events on #{github_url}"
 
     add_listener = ->
+      robot.logger.debug "Adding listener"
       if ! robot.brain.data.gh_hooks[github_url][repo][event].some((elem) ->
         _.isEqual(elem,msg.user)
       )
@@ -81,6 +83,7 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the repo
     if robot.brain.data.gh_hooks[github_url]?[repo]?[event] == undefined
+      site = robot.brain.data.gh_hooks[github_url] || {}
       msg.send "No previous listeners... listening"
       data = QS.stringify {
         "hub.mode": 'subscribe',
@@ -96,6 +99,8 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 204
+              site[repo] = []
+              robot.logger.debug "Adding listener"
               msg.send "Adding you as a listener"
               add_listener()
             else
