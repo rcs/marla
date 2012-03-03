@@ -149,7 +149,8 @@ module.exports = (robot) ->
             undefined
 
 
-      message = Handlebars.compile(views['push']).template(context)
+      template = Handlebars.compile(views['push'])
+      message = template(context)
       robot.logger.debug message
 
       listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name]['push'] || []
