@@ -9,6 +9,13 @@
 
 QS = require 'querystring'
 
+templates =
+  push:
+    """
+      [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}"
+      {{#each commits}}  {{author.username}}: {{commit.id}} {{commit.message}}
+    """
+
 module.exports = (robot) ->
   _ = require('underscore')
 
@@ -132,24 +139,22 @@ module.exports = (robot) ->
     if req.body.pusher
       robot.logger.debug "Got a thing. Parsing and displaying."
 
-      pusher = req.body.pusher
-      head = req.body.head_commit
-      repo = req.body.repository
-      repo_name = repo.owner.name + "/" + repo.name
-      first = req.body.commits[0]
+      context = _.extend req.body,
+        repo: req.body.repository
+        repo_name: req.body.repository.owner.name + "/" + repo.body.repository.name
+        branch: if req.body.ref
+            req.body.ref.replace(/^refs\/heads\//,'')
+          else
+            undefined
 
-      branch = req.body.ref.replace(/^refs\/heads\//,'')
 
-      robot.logger.debug "Finding #{repo_name}"
+      message = Handlebars.compile(views['push']).template(context)
+      robot.logger.debug message
+
       listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name]['push'] || []
 
-      message = []
-      message.push "[#{repo_name}] #{pusher.name} pushed to #{branch} #{req.body.compare}"
-      for commit in req.body.commits
-        message.push "  #{commit.author.username}: #{commit.id.substring(0,7)} #{commit.message}"
-
       for listener in listeners when listener
-        robot.send listener, message...
+        robot.send listener, message
 
       robot.logger.debug "#{pusher.name} pushed to #{branch} at #{repo.owner.name}/#{repo.name} #{req.body.compare}"
       robot.logger.debug "#{head.author.username}: #{head.id.substring(0,7)} #{head.message}"
