@@ -10,7 +10,7 @@
 QS = require 'querystring'
 Handlebars = require 'handlebars'
 
-templates =
+views =
   push:
     """
       [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}"
