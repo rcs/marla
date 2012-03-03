@@ -15,6 +15,55 @@ module.exports = (robot) ->
   room_or_user = (user) ->
 
 
+  robot.respond /gh_hooks subscriptions/, (msg) ->
+    msg.send JSON.stringify robot.brain.data.gh_hooks
+
+  robot.respond /gh_hooks unsubscribe (.*) (.*)? (.*)?/, (msg) ->
+    repo = msg.match[1]
+    event = msg.match[2] || 'push'
+    github_url = msg.match[3] || 'github.com'
+
+    msg.send "Unsubscribing to #{repo} #{event} events on #{github_url}"
+
+    removing_listener = ->
+      if ! robot.brain.data.gh_hooks[github_url][repo][event].some((elem) ->
+        _.isEqual(elem,msg.user)
+      )
+        robot.brain.data.gh_hooks[github_url][repo][event].push msg.user
+
+      msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
+
+    # Check to see if we have any subscriptions to this event type for the repo
+    listeners = robot.brain.data.gh_hooks[github_url]?[repo]?[event]
+
+    if ! listeners
+      return msg.send "Can't find any subscriptions for #{repo} #{event} events"
+
+    for i, listener in listeners
+      if _.isEqual(listener,msg.user)
+        removed = listeners.splice(i,1)
+
+    if ! removed
+      return msg.send "I don't think you're subscribed to #{repo} #{event} events"
+
+    if listeners.length == 0
+      msg.send "No listeners left, removing my subscription"
+      data = QS.stringify {
+        "hub.mode": 'unsubscribe',
+        "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
+        "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
+      }
+
+      msg.http("https://api.#{github_url}")
+        .path('/hub')
+        .auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
+        .post(data) (err,res,body) ->
+          switch res.statusCode
+            when 200
+              msg.send "Removed my subscription to #{repo} #{event} events"
+            else
+              msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
+
   robot.respond /gh_hooks subscribe (.*) (.*)? (.*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
@@ -48,7 +97,7 @@ module.exports = (robot) ->
             when 200
               add_listener()
             else
-              msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body}"
+              msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
       add_listener()
 
