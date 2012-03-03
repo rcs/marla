@@ -156,8 +156,10 @@ module.exports = (robot) ->
       robot.logger.debug JSON.stringify req.body
       message = JSON.stringify event: req.body
 
-    robot.logger.debug "LOoking for #{req.params.github} -> #{repo_name}-#{event}"
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
+
+    robot.logger.debug "Sending message:"
+    robot.logger.debug message
 
     for listener in listeners when listener
       robot.send listener, message.split("\n")...
