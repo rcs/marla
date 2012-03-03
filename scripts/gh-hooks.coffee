@@ -26,11 +26,9 @@ module.exports = (robot) ->
       if ! robot.brain.data.gh_hooks[github_url][repo][event].some((elem) ->
         _.isEqual(elem,msg.user)
       )
-        subscribed.push msg.user
+        robot.brain.data.gh_hooks[github_url][repo][event].push msg.user
 
       msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
-
-    subscribed = target[repo] ||= []
 
     # Check to see if we have any subscriptions to this event type for the repo
     if robot.brain.data.gh_hooks[github_url]?[repo]?[event] == undefined
