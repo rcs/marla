@@ -21,7 +21,12 @@ views =
     """
   issues:
     """
-      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} {{issue.html_url}}
+      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} "{{issue.title}}" {{issue.html_url}}
+    """
+  issue_comment:
+    """
+      {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{issue.title}}" {{issue.html_url}}
+      {{comment.body}}
     """
 
 module.exports = (robot) ->
@@ -154,7 +159,9 @@ module.exports = (robot) ->
     else
       robot.logger.debug "Template not found, pushing out lameness"
       robot.logger.debug JSON.stringify req.body
-      message = JSON.stringify event: req.body
+      message = {}
+      message[event] = req.body
+      message = JSON.stringify message
 
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
     robot.logger.debug "Body:"
