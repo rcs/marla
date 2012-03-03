@@ -135,30 +135,24 @@ module.exports = (robot) ->
   robot.router.post '/hubot/gh_hooks/:github/push', (req, res) ->
     req.body = req.body || {}
 
-    if ! req.body.pusher
-      robot.logger.debug "No pusher!"
 
-    if req.body.pusher
-      robot.logger.debug "Got a thing. Parsing and displaying."
+    return res.end "ok" unless req.body.repository # Not something we care about? Who does this?
 
-      context = _.extend req.body,
-        repo: req.body.repository
-        repo_name: req.body.repository.owner.name + "/" + req.body.repository.name
-        branch: if req.body.ref
-            req.body.ref.replace(/^refs\/heads\//,'')
-          else
-            undefined
+    context = _.extend req.body,
+      repo: req.body.repository
+      repo_name: req.body.repository.owner.name + "/" + req.body.repository.name
+      branch: if req.body.ref
+          req.body.ref.replace(/^refs\/heads\//,'')
+        else
+          undefined
 
-      robot.logger.debug JSON.stringify context
+    template = Handlebars.compile(views['push'])
+    message = template(context)
+    robot.logger.debug message
 
+    listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name]['push'] || []
 
-      template = Handlebars.compile(views['push'])
-      message = template(context)
-      robot.logger.debug message
-
-      listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name]['push'] || []
-
-      for listener in listeners when listener
-        robot.send listener, message
+    for listener in listeners when listener
+      robot.send listener, message.split("\n")...
 
     res.end "ok"
