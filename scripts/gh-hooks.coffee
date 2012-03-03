@@ -149,7 +149,7 @@ module.exports = (robot) ->
             req.body.ref.replace(/^refs\/heads\//,'')
           else
             undefined
-      template = Handlebars.compile(views['push'])
+      template = Handlebars.compile(views[event])
       message = template(context)
     else
       robot.logger.debug "Template not found, pushing out lameness"
