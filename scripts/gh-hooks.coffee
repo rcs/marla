@@ -43,6 +43,22 @@ views =
       {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
       {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
     """
+  pull_request_opened:
+    """
+      {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+      {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
+    """
+  pull_request_closed:
+    # Can check pull_request.merged to see if it was merged.
+    # Merger info in pull_request.merged_by
+    """
+      {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+    """
+  pull_request_synchronized:
+    """
+      {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+    """
+
 
 module.exports = (robot) ->
   _ = require('underscore')
@@ -144,6 +160,7 @@ module.exports = (robot) ->
               msg.send "Adding you as a listener"
               add_listener()
             else
+              robot.logger.debug "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
               msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
       msg.send "I'm already listening to these. Adding you"
