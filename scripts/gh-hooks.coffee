@@ -36,6 +36,11 @@ views =
       {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
       {{{comment.body}}}
     """
+  pull_request:
+    """
+      {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+      {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
+    """
 
 module.exports = (robot) ->
   _ = require('underscore')
