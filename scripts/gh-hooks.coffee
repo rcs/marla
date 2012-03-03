@@ -96,10 +96,12 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 204
+              msg.send "Adding you as a listener"
               add_listener()
             else
               msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
+      msg.send "I'm already listening to these. Adding you"
       add_listener()
 
 
