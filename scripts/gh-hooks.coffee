@@ -32,9 +32,9 @@ module.exports = (robot) ->
 
     removing_listener = ->
       if ! listeners.some((elem) ->
-        _.isEqual(elem,msg.user)
+        _.isEqual(elem,msg.message.user)
       )
-        listeners.push msg.user
+        listeners.push msg.message.user
 
       msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
 
@@ -42,7 +42,7 @@ module.exports = (robot) ->
       return msg.send "Can't find any subscriptions for #{repo} #{event} events"
 
     for i, listener in listeners
-      if _.isEqual(listener,msg.user)
+      if _.isEqual(listener,msg.message.user)
         removed = listeners.splice(i,1)
 
     if ! removed
@@ -83,12 +83,11 @@ module.exports = (robot) ->
       robot.logger.debug "Adding listener"
       robot.logger.debug JSON.stringify robot.brain.data.gh_hooks
       if ! listeners.some((elem) ->
-        _.isEqual(elem,msg.user)
+        _.isEqual(elem,msg.message.user)
       )
         robot.logger.debug "Pushing!"
         robot.logger.debug JSON.stringify listeners
-        robot.logger.debug JSON.stringify msg.user
-        listeners.push msg.user
+        listeners.push msg.message.user
         robot.logger.debug JSON.stringify listeners
 
       msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
