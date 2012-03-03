@@ -126,9 +126,11 @@ module.exports = (robot) ->
   robot.router.post '/hubot/gh_hooks/:github/push', (req, res) ->
     req.body = req.body || {}
 
-    robot.logger.debug JSON.stringify(req.body)
+    if ! req.body.pusher
+      robot.logger.debug "No pusher!"
 
     if req.body.pusher
+      robot.logger.debug "Got a thing. Parsing and displaying."
 
       pusher = req.body.pusher
       head = req.body.head_commit
