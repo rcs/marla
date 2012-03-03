@@ -95,7 +95,7 @@ module.exports = (robot) ->
         #.auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
         .post(data) (err,res,body) ->
           switch res.statusCode
-            when 200
+            when 204
               add_listener()
             else
               msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
