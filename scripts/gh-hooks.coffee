@@ -10,6 +10,8 @@
 QS = require 'querystring'
 Handlebars = require 'handlebars'
 
+EVENTS = ['push','issues']
+
 views =
   push:
     """
@@ -89,15 +91,10 @@ module.exports = (robot) ->
     listeners = events[event] ||= []
 
     add_listener = ->
-      robot.logger.debug "Adding listener"
-      robot.logger.debug JSON.stringify robot.brain.data.gh_hooks
       if ! listeners.some((elem) ->
         _.isEqual(elem,msg.message.user)
       )
-        robot.logger.debug "Pushing!"
-        robot.logger.debug JSON.stringify listeners
         listeners.push msg.message.user
-        robot.logger.debug JSON.stringify listeners
 
       msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
 
@@ -110,7 +107,6 @@ module.exports = (robot) ->
         "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
       }
 
-      robot.logger.debug ".auth('#{process.env.HUBOT_GITHUB_USER}','#{process.env.HUBOT_GITHUB_PASSWORD}')"
       msg.http("https://api.#{github_url}")
         .path('/hub')
         .header('Authorization', 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64'))
@@ -118,7 +114,6 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 204
-              robot.logger.debug "Adding listener"
               msg.send "Adding you as a listener"
               add_listener()
             else
@@ -132,11 +127,13 @@ module.exports = (robot) ->
     robot.brain.data.gh_hooks ||= {}
 
 
-  robot.router.post '/hubot/gh_hooks/:github/push', (req, res) ->
+  robot.router.post '/hubot/gh_hooks/:github/:event', (req, res) ->
     req.body = req.body || {}
 
+    return res.end "ok" unless req.body.repository # Not something we care about. Who does this?
 
-    return res.end "ok" unless req.body.repository # Not something we care about? Who does this?
+    event = req.params.event
+
 
     context = _.extend req.body,
       repo: req.body.repository
@@ -146,11 +143,13 @@ module.exports = (robot) ->
         else
           undefined
 
-    template = Handlebars.compile(views['push'])
-    message = template(context)
-    robot.logger.debug message
+    if views[event]
+      template = Handlebars.compile(views['push'])
+      message = template(context)
+    else
+      message = JSON.stringify event: body
 
-    listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name]['push'] || []
+    listeners = robot.brain.data.gh_hooks[req.params.github]?[context.repo_name][event] || []
 
     for listener in listeners when listener
       robot.send listener, message.split("\n")...
