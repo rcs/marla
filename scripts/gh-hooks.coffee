@@ -41,7 +41,7 @@ module.exports = (robot) ->
 
       msg.http("https://api.#{github_url}")
         .path('/hub')
-        .auth(HUBOT_GITHUB_USERNAME,HUBOT_GITHUB_PASSWORD)
+        .auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 200
