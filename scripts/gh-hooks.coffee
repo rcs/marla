@@ -86,7 +86,10 @@ module.exports = (robot) ->
         _.isEqual(elem,msg.user)
       )
         robot.logger.debug "Pushing!"
+        robot.logger.debug JSON.stringify listeners
+        robot.logger.debug JSON.stringify msg.user
         listeners.push msg.user
+        robot.logger.debug JSON.stringify listeners
 
       msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
 
