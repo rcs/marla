@@ -19,7 +19,7 @@ views =
       {{#each commits}}  {{author.username}}: {{id}} {{message}}
       {{/each}}
     """
-  issue:
+  issues:
     """
       {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} {{html_url}}
     """
