@@ -136,6 +136,7 @@ module.exports = (robot) ->
     repo_name =  req.body.repository.owner.name + "/" + req.body.repository.name
 
 
+    robot.logger.debug "Finding event #{event} in views"
     if views[event]
       context = _.extend req.body,
         repo: req.body.repository
@@ -147,6 +148,7 @@ module.exports = (robot) ->
       template = Handlebars.compile(views['push'])
       message = template(context)
     else
+      robot.logger.debug "Template not found, pushing out lameness"
       message = JSON.stringify event: req.body
 
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
