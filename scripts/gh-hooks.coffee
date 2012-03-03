@@ -36,7 +36,7 @@ module.exports = (robot) ->
       data = QS.stringify {
         "hub.mode": 'subscribe',
         "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
-        "hub.callback": "#{HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
+        "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
       }
 
       msg.http("https://api.#{github_url}")
