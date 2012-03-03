@@ -21,7 +21,7 @@ views =
     """
   issues:
     """
-      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} {{html_url}}
+      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} {{issue.html_url}}
     """
 
 module.exports = (robot) ->
@@ -157,6 +157,8 @@ module.exports = (robot) ->
       message = JSON.stringify event: req.body
 
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
+    robot.logger.debug "Body:"
+    robot.logger.debug JSON.stringify req.body
 
     robot.logger.debug "Sending message:"
     robot.logger.debug message
