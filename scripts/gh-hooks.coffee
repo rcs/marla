@@ -15,6 +15,7 @@ views =
     """
       [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}"
       {{#each commits}}  {{author.username}}: {{commit.id}} {{commit.message}}
+      {{/each}}
     """
 
 module.exports = (robot) ->
