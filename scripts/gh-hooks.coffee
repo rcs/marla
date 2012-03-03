@@ -134,7 +134,7 @@ module.exports = (robot) ->
 
       pusher = req.body.pusher
       head = req.body.head_commit
-      repo = req.body.repository.owner.name + "/" + req.body.repository.owner.name
+      repo = req.body.repository.name + "/" + req.body.repository.owner.name
       first = req.body.commits[0]
 
       branch = req.body.ref.replace(/^refs\/head\//,'')
