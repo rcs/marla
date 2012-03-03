@@ -149,8 +149,10 @@ module.exports = (robot) ->
       message = template(context)
     else
       robot.logger.debug "Template not found, pushing out lameness"
+      robot.logger.debug JSON.stringify req.body
       message = JSON.stringify event: req.body
 
+    robot.logger.debug "LOoking for #{req.params.github} -> #{repo_name}-#{event}"
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
 
     for listener in listeners when listener
