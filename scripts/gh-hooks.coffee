@@ -39,6 +39,7 @@ module.exports = (robot) ->
         "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
       }
 
+      robot.logger.debug ".auth('#{process.env.HUBOT_GITHUB_USER}','#{process.env.HUBOT_GITHUB_PASSWORD}')"
       msg.http("https://api.#{github_url}")
         .path('/hub')
         .auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
