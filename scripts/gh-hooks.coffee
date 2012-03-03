@@ -32,6 +32,7 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the repo
     if robot.brain.data.gh_hooks[github_url]?[repo]?[event] == undefined
+      msg.send "No previous listeners... listening"
       data = QS.stringify {
         "hub.mode": 'subscribe',
         "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
@@ -52,10 +53,10 @@ module.exports = (robot) ->
 
 
   robot.brain.on 'loaded', =>
-    robot.brain.data.gh-hooks = {}
+    robot.brain.data.gh_hooks = {}
 
 
-  robot.router.post '/hubot/gh-hooks/:github/push', (req, res) ->
+  robot.router.post '/hubot/gh_hooks/:github/push', (req, res) ->
     req.body = req.body || {}
 
     robot.logger.debug JSON.stringify(req.body)
