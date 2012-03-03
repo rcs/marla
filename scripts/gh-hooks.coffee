@@ -12,21 +12,23 @@ Handlebars = require 'handlebars'
 
 EVENTS = ['push','issues']
 
+
+# Note: Handlebars likes to HTML escape things. It's kinda lame as a default. {{{ }}} to avoid it.
 views =
   push:
     """
       [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}"
-      {{#each commits}}  {{author.username}}: {{id}} {{message}}
+      {{#each commits}}  {{author.username}}: {{id}} {{{message}}}
       {{/each}}
     """
   issues:
     """
-      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} "{{issue.title}}" {{issue.html_url}}
+      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
     """
   issue_comment:
     """
-      {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{issue.title}}" {{issue.html_url}}
-      {{comment.body}}
+      {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
+      {{{comment.body}}}
     """
 
 module.exports = (robot) ->
@@ -35,9 +37,11 @@ module.exports = (robot) ->
   room_or_user = (user) ->
 
 
+  # Public: Dump the subscriptions hash
   robot.respond /gh_hooks subscriptions/, (msg) ->
     msg.send JSON.stringify robot.brain.data.gh_hooks
 
+  # Public: Unsubscribe from an event type for a repository
   robot.respond /gh_hooks unsubscribe (.*) (.*)? (.*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
@@ -87,6 +91,7 @@ module.exports = (robot) ->
             else
               msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
 
+  # Public: Subsribe to an event type for a repository
   robot.respond /gh_hooks subscribe (.*) (.*)? (.*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
