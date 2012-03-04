@@ -335,7 +335,7 @@ module.exports = (robot) ->
     repo_name =  (req.body.repository.owner.login || req.body.repository.owner.name) + "/" + req.body.repository.name
     github_url = req.params.github
 
-    robot.logger.debug JSON.stringify context
+    robot.logger.debug JSON.stringify req.body
 
     # Extend the context for our templates
     context = _.extend req.body,
