@@ -230,7 +230,6 @@ module.exports = (robot) ->
     repo_name =  (req.body.repository.owner.login || req.body.repository.owner.name) + "/" + req.body.repository.name
 
 
-    robot.logger.debug "Finding event #{event} in views"
     if views[event]
       context = _.extend req.body,
         repo: req.body.repository
@@ -240,19 +239,14 @@ module.exports = (robot) ->
             req.body.ref.replace(/^refs\/heads\//,'')
           else
             undefined
-      message = renderTemplate(event,context,robot)
+      message = renderTemplate(event,context)
     else
-      robot.logger.debug "Template not found, pushing out lameness"
+      robot.logger.debug "Template not found for #{event}, pushing out raw"
       message = {}
       message[event] = req.body
       message = JSON.stringify message
 
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
-    robot.logger.debug "Body:"
-    robot.logger.debug JSON.stringify req.body
-
-    robot.logger.debug "Sending message:"
-    robot.logger.debug message
 
     for listener in listeners when listener
       robot.send listener, message.split("\n")...
