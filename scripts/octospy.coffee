@@ -234,11 +234,11 @@ module.exports = (robot) ->
       pubsub_modify msg, 'unsubscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
           switch res.statusCode
-            when 200
+            when 204
               delete events[event]
               msg.reply "You were the last. Removed my subscription to #{repo} #{event} events"
             else
-              msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
+              msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
 
   # Public: Subsribe to an event type for a repository
   #
