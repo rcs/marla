@@ -265,6 +265,7 @@ module.exports = (robot) ->
               add_listener()
             when 422
               msg.reply "Either #{repo} doesn't exist, or #{process.env.HUBOT_GITHUB_USER} isn't a collaborator on it. Couldn't subscribe."
+              robot.logger.debug "#{JSON.stringify body}"
             else
               msg.reply "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
