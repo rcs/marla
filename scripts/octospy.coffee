@@ -209,12 +209,10 @@ module.exports = (robot) ->
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
 
-    # Convenience accessors with initialization
-    repos = robot.brain.data.octospy[github_url] || = {}
-    events = repos[repo] ||= {}
-    listeners = events[event] ||= []
+    # Convenience accessor
+    listeners = robot.brain.data.octospy[github_url]?[repo]?[event]?
 
-    if listeners.length == 0
+    if ! listeners
       return msg.send "Can't find any octospies for #{repo} #{event} events"
 
     # Find the user in possible listeners
@@ -236,9 +234,18 @@ module.exports = (robot) ->
         (err,res,body) ->
           switch res.statusCode
             when 204
+              data = robot.brain.data.octospy
+              repos = data[github_url]
+              events = repos[repo]
+
               delete events[event]
+              delete repos[repo] if (a for a of events).length == 0
+              delete data[github_url] if (a for a of repos).length == 0
+
+              # robot.brain.data.octospy = data
               # Here to hook the redis magic
-              repos[repo] = events
+              robot.brain.data.octospy[github_url][repo] = events
+
               robot.logger.info "The last user unsubscribed. Removed my subscription to #{repo} #{event} events"
             else
               robot.logger.warning "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
@@ -257,16 +264,18 @@ module.exports = (robot) ->
     if ! _.include(( known for known of views ), event)
       return msg.reply "Sorry, I don't know about #{event} events"
 
-    # Convenience accessors with initialization
-    repos = robot.brain.data.octospy[github_url] || = {}
-    events = repos[repo] ||= {}
-    listeners = events[event] ||= []
-
+    # Convenience accessor
+    listeners = robot.brain.data.octospy[github_url]?[repo]?[event]
 
     # Internal: Add a listener
     #
     # Closes around msg, repo, event, github_url
     addListener = ->
+      # Vivify!
+      repos = robot.brain.data.octospy[github_url] ||= {}
+      events = repos[repo] ||= {}
+      listeners = events[event] ||= []
+
       if ! _.include(listeners, msg.message.user.id)
         listeners.push msg.message.user.id
         msg.reply "Octospying #{repo} #{event} events on #{github_url}"
@@ -275,7 +284,7 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the
     # repo, and if not, register the subscription
-    if listeners.length == 0
+    if ! listeners == 0
       pubsub_modify msg, 'subscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
           switch res.statusCode
