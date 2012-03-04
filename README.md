@@ -1,4 +1,4 @@
-# Hubot - The bot that loves you more than ever.
+# Hubot - The bot that loves you more than ever. It's getting creepy.
 
 This is a version of GitHub's Campfire bot, hubot. He's pretty cool.
 
