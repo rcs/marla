@@ -39,7 +39,7 @@ Handlebars = require 'handlebars'
 renderTemplate = (event,context) ->
   if views[event]
     if _.isFunction(views[event])
-      str = views[event](context)
+      message = views[event](context)
     else
       str = views[event]
       template = Handlebars.compile(str)
@@ -92,12 +92,18 @@ pubsub_modify = (msg, action, target, cb) ->
 # These are views for each of the event types.
 # Note: Handlebars likes to HTML escape things. It's kinda lame as a default. {{{ }}} to avoid it.
 views =
-  push:
-    """
+  push: (context) ->
+    if commits.length > 3
+      commits.extra_commits = commits.length - 3
+    end
+    context.short_commits = context.commits.slice(0,3)
+    template = Handlebars.compile """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-      {{#each commits}}  {{author.username}}: {{id}} {{{message}}}
-      {{/each}}
+      {{#each short_commits}}  {{author.username}}: {{id}} {{{message}}}
+      {{/each}}{{#if extra_commits }}... +{{extra_commits}} more{{/if}}
     """
+    template = Handlebars.compile(template)
+    message = template(context)
   issues:
     """
       {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
@@ -108,8 +114,7 @@ views =
       > {{{comment.body}}}
     """
   pull_request: (context) ->
-
-    return switch context.action
+    str = switch context.action
       when 'opened'
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
@@ -129,6 +134,8 @@ views =
         """
           {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
         """
+    template = Handlebars.compile(template)
+    message = template(context)
 
   gollum:
     """
@@ -306,9 +313,6 @@ module.exports = (robot) ->
               robot.logger.warning "#{JSON.stringify body}"
     else
       addListener()
-
-
-
 
   # Public: Repond to POSTs from github
   #
