@@ -1,4 +1,4 @@
-#  Octospy GitHub events, watch what's happening with your projects
+# Octospy GitHub events, watch what's happening with your projects
 # Powered by http://developer.github.com/v3/repos/hooks/
 #
 # octospy <repo> [event_type] - Start watching events for the repo, default push
@@ -335,6 +335,7 @@ module.exports = (robot) ->
     repo_name =  (req.body.repository.owner.login || req.body.repository.owner.name) + "/" + req.body.repository.name
     github_url = req.params.github
 
+    robot.logger.debug JSON.stringify context
 
     # Extend the context for our templates
     context = _.extend req.body,
