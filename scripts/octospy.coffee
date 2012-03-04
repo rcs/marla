@@ -276,7 +276,6 @@ module.exports = (robot) ->
       repos = robot.brain.data.octospy[github_url] ||= {}
       events = repos[repo] ||= {}
       listeners = events[event] ||= []
-      robot.logger.debug "Your mom"
 
       # See whether we're already listening
       if (listener for listener in listeners when listener == msg.message.user.id).length == 0
@@ -287,11 +286,9 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the
     # repo, and if not, register the subscription
-    if listeners.length == 0
-      robot.logger.debug "No listeners.."
+    if ! listeners
       pubsub_modify msg, 'subscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
-          robot.logger.debug "Your mom in response"
           switch res.statusCode
             when 204
               addListener()
