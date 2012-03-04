@@ -38,7 +38,7 @@ renderTemplate = (event,context) ->
   message = template(context)
 
 
-pubsub_modify = (http, action, target, cb) ->
+pubsub_modify = (msg, action, target, cb) ->
   {github_url, repo, event} = target
 
   data = QS.stringify {
@@ -47,7 +47,7 @@ pubsub_modify = (http, action, target, cb) ->
     "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
   }
 
-  http("https://api.#{github_url}")
+  msg.http("https://api.#{github_url}")
     .path('/hub')
     .header('Authorization', 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64'))
     .post(data) cb
@@ -161,7 +161,7 @@ module.exports = (robot) ->
 
 
     if listeners.length == 0
-      pubsub_modify robot.http, 'unsubscribe', { github_url: github_url, repo: repo, event: event },
+      pubsub_modify msg, 'unsubscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
           switch res.statusCode
             when 200
@@ -191,7 +191,7 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the repo
     if listeners.length == 0
-      pubsub_modify robot.http, 'subscribe', { github_url: github_url, repo: repo, event: event },
+      pubsub_modify msg, 'subscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
           switch res.statusCode
             when 204
