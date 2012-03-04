@@ -40,8 +40,7 @@ renderTemplate = (event,context) ->
     if _.isFunction(views[event])
       message = views[event](context)
     else
-      str = views[event]
-      template = Handlebars.compile(str)
+      template = Handlebars.compile(views[event])
       message = template(context)
   else
     # We couldn't find a template, so let's push this out. People on github like JSON, right?
@@ -96,7 +95,7 @@ views =
       context.commits.extra_commits = context.commits.length - 3
 
     context.short_commits = context.commits.slice(0,3)
-    template = Handlebars.compile """
+    template = """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
       {{#each short_commits}}  {{author.username}}: {{id}} {{{message}}}
       {{/each}}{{#if extra_commits }}... +{{extra_commits}} more{{/if}}
