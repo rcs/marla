@@ -342,7 +342,7 @@ module.exports = (robot) ->
 
     robot.logger.debug JSON.stringify (robot.brain.data.octospy[github_url]?[repo_name][event] || [])
     # Tell the people who care
-    listeners = robot.userForId(id) for id in (robot.brain.data.octospy[github_url]?[repo_name][event] || [])
+    listeners = (robot.userForId(id) for id in (robot.brain.data.octospy[github_url]?[repo_name][event] || []))
 
     robot.logger.debug JSON.stringify listeners
     robot.logger.debug JSON.stringify _.groupBy(listeners,'room')
