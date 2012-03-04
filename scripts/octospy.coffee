@@ -31,6 +31,12 @@ Handlebars = require 'handlebars'
 Handlebars.registerHelper 'trim', (str, length) ->
   str.substring 0, length
 
+Handlebars.registerHelper 'overflow', (str, length) ->
+  if str.length > length
+    str.substring(0,length-3) + '...'
+  else
+    str
+
 # Internal: Given a template name and a context, return the compiled template.
 # Returns JSONed context if no template is found.
 #
@@ -100,7 +106,7 @@ views =
     context.short_commits = context.commits.slice(0,3)
     template = """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-      {{#each short_commits}}  {{author.username}}: {{shortId id}} {{{message}}}
+      {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{message}}}
       {{/each}}{{#if extra_commits }}  ... +{{extra_commits}} more{{/if}}
     """
     template = Handlebars.compile(template)
