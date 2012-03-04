@@ -276,6 +276,7 @@ module.exports = (robot) ->
       repos = robot.brain.data.octospy[github_url] ||= {}
       events = repos[repo] ||= {}
       listeners = events[event] ||= []
+      robot.logger.debug "Your mom"
 
       # See whether we're already listening
       if (listener for listener in listeners when listener == msg.message.user.id).length == 0
