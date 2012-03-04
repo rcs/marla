@@ -95,7 +95,7 @@ pubsub_modify = (msg, action, target, cb) ->
 views =
   push: (context) ->
     if context.commits.length > 3
-      context.commits.extra_commits = context.commits.length - 3
+      context.extra_commits = context.commits.length - 3
 
     context.short_commits = context.commits.slice(0,3)
     template = """
