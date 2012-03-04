@@ -134,7 +134,7 @@ module.exports = (robot) ->
 
   # Public: Announce the kinds of things octospy knows about
   robot.respond /octospy events/, (msg) ->
-    msg.reply "I know about " + ( event for event of views ).join(' ,')
+    msg.reply "I know about " + ( event for event of views ).join(', ')
 
   # Public: Dump the watching hash
   robot.respond /octospy watching/, (msg) ->
@@ -207,7 +207,7 @@ module.exports = (robot) ->
     listeners = events[event] ||= []
 
     add_listener = ->
-      if ! _include(listeners, msg.message.user_ud)
+      if ! _.include(listeners, msg.message.user_ud)
         listeners.push msg.message.user.id
         msg.reply "Octospying #{repo} #{event} events on #{github_url}"
       else
