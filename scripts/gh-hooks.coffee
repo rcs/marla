@@ -59,7 +59,7 @@ views =
     robot.logger.debug "Finding for pull request"
     robot.logger.debug JSON.stringify context
 
-    return switch context.pull_request.action
+    return switch context.action
       when 'opened'
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
@@ -75,7 +75,7 @@ views =
             """
               {{sender.login}} closed pull requst {{number}} on {{repo_name}} without merging: "{{{pull_request.title}}}" {{pull_request.html_url}}
             """
-      when 'synchronized'
+      when 'synchronize'
         """
           {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
         """
