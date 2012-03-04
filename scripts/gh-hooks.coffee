@@ -3,17 +3,30 @@
 #
 # Environment Variables:
 #
-# PREFIX_URL  : The place where this hubot is mounted (ex "http//hubot.example.com"
-# GITHUB_USER : The github user to use for the API
-# GITHUB_USER : The password to use for the API
-#
+# HUBOT_URL             : The place where this hubot is mounted (ex "http//hubot.example.com"
+# HUBOT_GITHUB_USER     : The github user to use for the API
+# HUBOT_GITHUB_PASSWORD : The password to use for the API
 #
 
 # TODO: 
 # add commit_comment support -- requires a round-trip to github to get the commit
 # add pull_request support -- helpers necessary for opened/closed/synchronized display --- Sub templates? :-( (Not so bad, can switch on "action", thanks GH!")
 #
+# Add dynamic listeners -- register subscriptions if we get a post from a github postback
 #
+
+# Private: Given a template name and a context, return the compiled template
+#
+# If the template in the views hash is a function, pass it the context to get the specific template
+renderTemplate = (template,context) ->
+  if _.isFunction(views[template])
+    str = views[template](context)
+  else
+    str = views[template]
+
+  template = Handlebars.compile(str)
+  message = template(context)
+
 
 QS = require 'querystring'
 Handlebars = require 'handlebars'
@@ -43,21 +56,29 @@ views =
       {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
       {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
     """
-  pull_request_opened:
-    """
-      {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
-      {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
-    """
-  pull_request_closed:
-    # Can check pull_request.merged to see if it was merged.
-    # Merger info in pull_request.merged_by
-    """
-      {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
-    """
-  pull_request_synchronized:
-    """
-      {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
-    """
+
+  pull_request: (context) ->
+    switch context.action
+      when 'opened'
+        """
+          {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+          {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
+        """
+      when 'closed'
+        switch context.pull_request.merged
+          when true
+            """
+              {{sender.login}} merged pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+            """
+          else
+            """
+              {{sender.login}} closed pull requst {{number}} on {{repo_name}} without merging: "{{{pull_request.title}}}" {{pull_request.html_url}}
+            """
+      when 'synchronized'
+        """
+          {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+        """
+
   gollum:
     """
       {{#each pages}}
@@ -216,8 +237,7 @@ module.exports = (robot) ->
             req.body.ref.replace(/^refs\/heads\//,'')
           else
             undefined
-      template = Handlebars.compile(views[event])
-      message = template(context)
+      message = renderTemplate(context)
     else
       robot.logger.debug "Template not found, pushing out lameness"
       message = {}
