@@ -80,9 +80,7 @@ pubsub_modify = (msg, action, target, cb) ->
     auth = "token #{process.env.HUBOT_GITHUB_TOKEN}"
   else if (process.env.HUBOT_GITHUB_USER and process.env.HUBOT_GITHUB_PASSWORD)
     auth = 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64')
-    kjhkjhsdfs()
   else
-    llamallama()
     return cb({},{statusCode: 401}, {message: "Octospy doesn't have credentials"})
 
   msg.http("https://api.#{github_url}")
