@@ -58,6 +58,12 @@ views =
     """
       {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
     """
+  gollum:
+    """
+      {{#each pages}}
+        {{../sender.login}} {{action}} wiki page {{{title}}} {{html_url}}
+      {{/each}}
+    """
 
 
 module.exports = (robot) ->
