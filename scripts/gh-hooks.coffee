@@ -64,6 +64,10 @@ views =
         {{../sender.login}} {{action}} wiki page on {{repo_name}}: "{{{title}}}" {{html_url}}
       {{/each}}
     """
+  watch:
+    """
+    {{sender.login}} started watching {{repo_name}} http://{{github_url}}/users/{{sender.login}}
+    """
 
 
 module.exports = (robot) ->
@@ -191,6 +195,7 @@ module.exports = (robot) ->
       context = _.extend req.body,
         repo: req.body.repository
         repo_name: repo_name
+        github_url: req.params.github
         branch: if req.body.ref
             req.body.ref.replace(/^refs\/heads\//,'')
           else
