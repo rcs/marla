@@ -15,6 +15,10 @@
 # Add dynamic listeners -- register subscriptions if we get a post from a github postback
 #
 
+_ = require('underscore')
+QS = require 'querystring'
+Handlebars = require 'handlebars'
+
 # Private: Given a template name and a context, return the compiled template
 #
 # If the template in the views hash is a function, pass it the context to get the specific template
@@ -28,8 +32,6 @@ renderTemplate = (template,context) ->
   message = template(context)
 
 
-QS = require 'querystring'
-Handlebars = require 'handlebars'
 
 EVENTS = ['push','issues']
 
@@ -113,7 +115,6 @@ views =
 
 
 module.exports = (robot) ->
-  _ = require('underscore')
 
   room_or_user = (user) ->
 
