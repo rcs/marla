@@ -236,8 +236,9 @@ module.exports = (robot) ->
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
 
+    # Don't go any further if we don't know about the event type
     if ! _.include(( known for event of views ), event)
-      return msg.reply "Sorry, I don't know about #{event}"
+      return msg.reply "Sorry, I don't know about #{event} events"
 
     # Convenience accessors with initialization
     repos = robot.brain.data.octospy[github_url] || = {}
