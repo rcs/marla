@@ -80,7 +80,9 @@ pubsub_modify = (msg, action, target, cb) ->
     auth = "token #{process.env.HUBOT_GITHUB_TOKEN}"
   else if (process.env.HUBOT_GITHUB_USER and process.env.HUBOT_GITHUB_PASSWORD)
     auth = 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64')
+    kjhkjhsdfs()
   else
+    llamallama()
     return cb({},{statusCode: 401}, {message: "Octospy doesn't have credentials"})
 
   msg.http("https://api.#{github_url}")
@@ -279,9 +281,9 @@ module.exports = (robot) ->
               add_listener()
             when 401
               msg.reply """
+                Failed to auth: #{JSON.stringify body}
                 Specify credentials in the environment. (HUBOT_GITHUB_USERNAME,HUBOT_GITHUB_PASSWORD) or HUBOT_GITHUB_TOKEN"
                 To create a token: curl -u 'user:pass' https://api.github.com/authorizations -d '{"scopes":["repo"],"note":"Hubot Octospy"}'
-                #{JSON.stringify body}
               """
             when 422
               msg.reply "Either #{repo} doesn't exist, or my credentials don't make me a collaborator on it. Couldn't subscribe."
