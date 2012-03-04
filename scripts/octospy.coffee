@@ -345,6 +345,7 @@ module.exports = (robot) ->
     listeners = robot.userForId(id) for id in (robot.brain.data.octospy[github_url]?[repo_name][event] || [])
 
     robot.logger.debug JSON.stringify listeners
+    robot.logger.debug JSON.stringify _.groupBy(listeners,'room')
     robot.logger.debug JSON.stringify(room) for room of _.groupBy(listeners, 'room') when room
 
     # group rooms together, so we don't spam with multiple people with subs
