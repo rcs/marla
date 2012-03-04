@@ -137,6 +137,7 @@ module.exports = (robot) ->
     for url, github of robot.brain.data.gh_hooks
       for repo_name, repo of github
         for event, listeners of repo
+          robot.logger.debug "Checking #{msg.message.user.id} against #{JSON.stringify listeners}"
           if listeners.include? msg.message.user.id
             subscriptions.push
               github: github_url
