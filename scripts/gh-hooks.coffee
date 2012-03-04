@@ -74,7 +74,19 @@ views =
     """
   fork:
     """
-      {{sender.login}} forked {{repo_name}} {{fork.html_url}}
+      {{sender.login}} forked {{repo_name}} {{forkee.html_url}}
+    """
+  fork_apply:
+    """
+      {{sender.login}} merged from the fork queue to {{head}} on {{repo_name}}
+    """
+  member:
+    """
+      {{sender.login}} added {{member.login}} as a collaborator to {{repo_name}}
+    """
+  public:
+    """
+      {{sender.login}} turned {{repo_name}} public
     """
 
 
