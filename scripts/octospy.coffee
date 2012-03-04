@@ -1,4 +1,4 @@
-#  Octospy GitHub events, watch what's happening with your projects
+# Octospy GitHub events, watch what's happening with your projects
 # Powered by http://developer.github.com/v3/repos/hooks/
 #
 # octospy <repo> [event_type] - Start watching events for the repo, default push
@@ -100,9 +100,9 @@ pubsub_modify = (msg, action, target, cb) ->
 # Note: Handlebars likes to HTML escape things. It's kinda lame as a default. {{{ }}} to avoid it.
 views =
   push: (context) ->
-    if context.created 
+    if context.created
       template = """
-        {{pusher.name}} created a new branch {{branch}} at {{repo_name}} {{compare}}
+        {{pusher.name}} created a new branch "{{branch}}" on {{repo_name}} {{compare}}
       """
     else
       if context.commits.length > 3
