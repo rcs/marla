@@ -42,7 +42,7 @@ pubsub_modify = (msg, action, target, cb) ->
   {github_url, repo, event} = target
 
   data = QS.stringify {
-    "hub.mode": 'action',
+    "hub.mode": action,
     "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
     "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
   }
