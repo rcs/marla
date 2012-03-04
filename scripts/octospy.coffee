@@ -1,4 +1,4 @@
-# Octospy GitHub events, watch what's happening with your projects
+#  Octospy GitHub events, watch what's happening with your projects
 # Powered by http://developer.github.com/v3/repos/hooks/
 #
 # octospy <repo> [event_type] - Start watching events for the repo, default push
