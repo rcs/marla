@@ -1,4 +1,4 @@
-# Octospy GitHub events, watch what's happening with your projects
+#  Octospy GitHub events, watch what's happening with your projects
 # Powered by http://developer.github.com/v3/repos/hooks/
 #
 # octospy <repo> [event_type] - Start watching events for the repo, default push
@@ -94,7 +94,7 @@ views =
   push: (context) ->
     if context.commits.length > 3
       context.commits.extra_commits = context.commits.length - 3
-    end
+
     context.short_commits = context.commits.slice(0,3)
     template = Handlebars.compile """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
