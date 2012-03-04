@@ -151,19 +151,11 @@ module.exports = (robot) ->
 
     msg.send "Unsubscribing to #{repo} #{event} events on #{github_url}"
 
-    removing_listener = ->
-      if ! listeners.some((elem) ->
-        _.isEqual(elem,msg.message.user)
-      )
-        listeners.push msg.message.user
-
-      msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
-
     if listeners.length == 0
       return msg.send "Can't find any subscriptions for #{repo} #{event} events"
 
-    for i, listener in listeners
-      robot.logger.debug "Matching #{JSON.stringify listener} with #{msg.message.user}"
+    for listener, i in listeners
+      robot.logger.debug "Matching #{JSON.stringify listener} with #{JSON.stringify msg.message.user}"
       if _.isEqual(listener,msg.message.user)
         removed = listeners.splice(i,1)
 
@@ -194,9 +186,9 @@ module.exports = (robot) ->
 
     add_listener = ->
       if ! listeners.some((elem) ->
-        _.isEqual(elem,msg.message.user)
+        _.isEqual(elem,msg.message.user.id)
       )
-        listeners.push msg.message.user
+        listeners.push msg.message.user.id
 
       msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
 
