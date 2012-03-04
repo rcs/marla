@@ -66,8 +66,13 @@ views =
     """
   watch:
     """
-    {{sender.login}} started watching {{repo_name}} http://{{github_url}}/users/{{sender.login}}
+      {{sender.login}} started watching {{repo_name}} http://{{github_url}}/{{sender.login}}
     """
+  download:
+    """
+      {{sender.login}} added a download to {{repo_name}}: {{{download.name}}} {{download.html_url}}
+    """
+
 
 
 module.exports = (robot) ->
