@@ -10,6 +10,11 @@
 
 # TODO:
 # add commit_comment support -- requires a round-trip to github to get the commit
+# Fix regex, so github.com doesn't have to be specified anywhere
+# Better subscription listing support
+#
+# PIPEDREAM:
+# Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
 
 _ = require('underscore')
 QS = require 'querystring'
@@ -32,6 +37,20 @@ renderTemplate = (event,context) ->
   template = Handlebars.compile(str)
   message = template(context)
 
+
+pubsub_modify = (action, target, cb) ->
+  {github_url, repo, event} = target
+
+  data = QS.stringify {
+    "hub.mode": 'action',
+    "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
+    "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
+  }
+
+  msg.http("https://api.#{github_url}")
+    .path('/hub')
+    .header('Authorization', 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64'))
+    .post(data) cb
 
 
 EVENTS = ['push','issues']
@@ -150,17 +169,10 @@ module.exports = (robot) ->
     if ! removed
       return msg.send "I don't think you're subscribed to #{repo} #{event} events"
 
-    if listeners.length == 0
-      data = QS.stringify {
-        "hub.mode": 'unsubscribe',
-        "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
-        "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
-      }
 
-      msg.http("https://api.#{github_url}")
-        .path('/hub')
-        .auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
-        .post(data) (err,res,body) ->
+    if listeners.length == 0
+      pubsub_modify 'unsubscribe', { github_url: github_url, repo: repo, event: event },
+        (err,res,body) ->
           switch res.statusCode
             when 200
               delete events[event]
@@ -189,17 +201,8 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the repo
     if listeners.length == 0
-      data = QS.stringify {
-        "hub.mode": 'subscribe',
-        "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
-        "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
-      }
-
-      msg.http("https://api.#{github_url}")
-        .path('/hub')
-        .header('Authorization', 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64'))
-        #.auth(process.env.HUBOT_GITHUB_USER,process.env.HUBOT_GITHUB_PASSWORD)
-        .post(data) (err,res,body) ->
+      pubsub_modify 'subscribe', { github_url: github_url, repo: repo, event: event },
+        (err,res,body) ->
           switch res.statusCode
             when 204
               add_listener()
