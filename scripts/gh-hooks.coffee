@@ -61,7 +61,7 @@ views =
   gollum:
     """
       {{#each pages}}
-        {{../sender.login}} {{action}} wiki page {{{title}}} {{html_url}}
+        {{../sender.login}} {{action}} wiki page on {{repo_name}}: "{{{title}}}" {{html_url}}
       {{/each}}
     """
 
