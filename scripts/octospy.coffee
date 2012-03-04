@@ -260,7 +260,7 @@ module.exports = (robot) ->
             when 204
               add_listener()
             when 422
-              msg.reply "Either #{repo} doesn't exist, or #{process.env.GITHUB_USER} isn't a collaborator on it. Couldn't subscribe."
+              msg.reply "Either #{repo} doesn't exist, or #{process.env.HUBOT_GITHUB_USER} isn't a collaborator on it. Couldn't subscribe."
             else
               msg.reply "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
