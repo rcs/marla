@@ -22,11 +22,16 @@ Handlebars = require 'handlebars'
 # Private: Given a template name and a context, return the compiled template
 #
 # If the template in the views hash is a function, pass it the context to get the specific template
-renderTemplate = (template,context) ->
+renderTemplate = (template,context,robot) ->
+  robot.logger.debug "Rendering #{template}"
   if _.isFunction(views[template])
-    str = views[template](context)
+    robot.logger.debug "Calling a function!"
+    str = views[template](_.extend(context,{robot:robot}))
   else
+    robot.logger.debug "Rendering basic template"
     str = views[template]
+
+  robot.logger.debug "Template is : #{str}"
 
   template = Handlebars.compile(str)
   message = template(context)
@@ -53,15 +58,12 @@ views =
       {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
       {{{comment.body}}}
     """
-  pull_request:
-    """
-      {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
-      {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
-    """
-
   pull_request: (context) ->
+    context.robot.logger.debug "In pull request, going to render"
+
     switch context.action
       when 'opened'
+        context.robot.logger.debug "Opening"
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
           {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
