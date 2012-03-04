@@ -10,7 +10,6 @@
 
 # TODO:
 # add commit_comment support -- requires a round-trip to github to get the commit
-# Fix regex, so github.com doesn't have to be specified anywhere
 # Better subscription listing support
 #
 # PIPEDREAM:
@@ -133,10 +132,30 @@ module.exports = (robot) ->
 
   # Public: Dump the subscriptions hash
   robot.respond /gh_hooks subscriptions/, (msg) ->
-    msg.send JSON.stringify robot.brain.data.gh_hooks
+    subscriptions = []
+
+    for url, github of robot.brain.data.gh_hooks
+      for repo_name, repo of github
+        for event, listeners of repo
+          if listeners.include? msg.message.user.id
+            subscriptions.push
+              github: github_url
+              repo_name: repo
+              event: event
+
+    if subscriptions.length > 0
+      msg.reply (for sub in subscriptions
+        "#{repo_name} #{event} events" + if github != 'github.com'
+            "on #{github}"
+          else
+            ""
+      )
+    else
+      msg.reply "I can't find any subscriptions for you"
+
 
   # Public: Unsubscribe from an event type for a repository
-  robot.respond /gh_hooks unsubscribe (.*) (.*)? (.*)?/, (msg) ->
+  robot.respond /gh_hooks unsubscribe ([^ ]*) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
@@ -171,7 +190,7 @@ module.exports = (robot) ->
               msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
 
   # Public: Subsribe to an event type for a repository
-  robot.respond /gh_hooks subscribe (.*) (.*)? (.*)?/, (msg) ->
+  robot.respond /gh_hooks subscribe ([^ ]*) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
