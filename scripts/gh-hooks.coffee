@@ -22,12 +22,13 @@ Handlebars = require 'handlebars'
 # Private: Given a template name and a context, return the compiled template
 #
 # If the template in the views hash is a function, pass it the context to get the specific template
-renderTemplate = (template,context) ->
+renderTemplate = (template,context,robot) ->
   if _.isFunction(views[template])
     str = views[template](context)
   else
     str = views[template]
 
+  robot.logger.debug str if robot
   template = Handlebars.compile(str)
   message = template(context)
 
@@ -231,7 +232,7 @@ module.exports = (robot) ->
             req.body.ref.replace(/^refs\/heads\//,'')
           else
             undefined
-      message = renderTemplate(event,context)
+      message = renderTemplate(event,context,robot)
     else
       robot.logger.debug "Template not found for #{event}, pushing out raw"
       message = {}
