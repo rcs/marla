@@ -240,7 +240,7 @@ module.exports = (robot) ->
             req.body.ref.replace(/^refs\/heads\//,'')
           else
             undefined
-      message = renderTemplate(context,robot)
+      message = renderTemplate(event,context,robot)
     else
       robot.logger.debug "Template not found, pushing out lameness"
       message = {}
