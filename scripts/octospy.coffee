@@ -100,9 +100,9 @@ pubsub_modify = (msg, action, target, cb) ->
 # Note: Handlebars likes to HTML escape things. It's kinda lame as a default. {{{ }}} to avoid it.
 views =
   push: (context) ->
-    if context.created 
+    if context.created
       template = """
-        {{pusher.name}} created a new branch {{branch}} at {{repo_name}} {{compare}}
+        {{pusher.name}} created a new branch "{{branch}}" on {{repo_name}} {{compare}}
       """
     else
       if context.commits.length > 3
