@@ -11,6 +11,7 @@
 # TODO:
 # add commit_comment support -- requires a round-trip to github to get the commit
 # Better subscription listing support
+# Messagin on trying to watch a non-collab repo
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -28,13 +29,14 @@ renderTemplate = (event,context) ->
       str = views[event](context)
     else
       str = views[event]
+      template = Handlebars.compile(str)
+      message = template(context)
   else
     message = {}
     message[event] = req.body
     message = JSON.stringify message
 
-  template = Handlebars.compile(str)
-  message = template(context)
+  return message
 
 
 pubsub_modify = (msg, action, target, cb) ->
@@ -43,7 +45,7 @@ pubsub_modify = (msg, action, target, cb) ->
   data = QS.stringify {
     "hub.mode": action,
     "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
-    "hub.callback": "#{process.env.HUBOT_URL}/hubot/gh_hooks/#{github_url}/#{event}"
+    "hub.callback": "#{process.env.HUBOT_URL}/hubot/octospy/#{github_url}/#{event}"
   }
 
   msg.http("https://api.#{github_url}")
@@ -70,7 +72,7 @@ views =
   issue_comment:
     """
       {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
-      {{{comment.body}}}
+      > {{{comment.body}}}
     """
   pull_request: (context) ->
 
@@ -130,54 +132,57 @@ views =
 
 module.exports = (robot) ->
 
-  # Public: Dump the subscriptions hash
-  robot.respond /gh_hooks subscriptions/, (msg) ->
-    subscriptions = []
+  # Public: Announce the kinds of things octospy knows about
+  robot.respond /octospy events/, (msg) ->
+    msg.reply "I know about " + ( event for event of views ).join(' ,')
 
-    for github_url, github of robot.brain.data.gh_hooks
+  # Public: Dump the watching hash
+  robot.respond /octospy watching/, (msg) ->
+    watching = []
+
+    for github_url, github of robot.brain.data.octospy
       for repo_name, repo of github
         for event, listeners of repo
           robot.logger.debug "Checking #{msg.message.user.id} against #{JSON.stringify listeners}"
           if _.include(listeners, msg.message.user.id)
-            subscriptions.push
+            watching.push
               github: github_url
               repo_name: repo
               event: event
 
-    if subscriptions.length > 0
-      msg.reply (for sub in subscriptions
+    if watching.length > 0
+      msg.reply (for sub in watching
         "#{repo_name} #{event} events" + if github_url != 'github.com'
             "on #{github}"
           else
             ""
       )
     else
-      msg.reply "I can't find any subscriptions for you"
+      msg.reply "I don't think you're octospying anything"
 
 
   # Public: Unsubscribe from an event type for a repository
-  robot.respond /gh_hooks unsubscribe ([^ ]*) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
+  robot.respond /octospy remove ([^ ]*) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
 
     # Convenience accessors with initialization
-    repos = robot.brain.data.gh_hooks[github_url] || = {}
+    repos = robot.brain.data.octospy[github_url] || = {}
     events = repos[repo] ||= {}
     listeners = events[event] ||= []
 
-    msg.send "Unsubscribing to #{repo} #{event} events on #{github_url}"
+    msg.reply "Unoctospying #{repo} #{event} events on #{github_url}"
 
     if listeners.length == 0
-      return msg.send "Can't find any subscriptions for #{repo} #{event} events"
+      return msg.send "Can't find any octospies for #{repo} #{event} events"
 
     for listener, i in listeners
-      robot.logger.debug "Matching #{JSON.stringify listener} with #{JSON.stringify msg.message.user}"
       if _.isEqual(listener,msg.message.user)
         removed = listeners.splice(i,1)
 
     if ! removed
-      return msg.send "I don't think you're subscribed to #{repo} #{event} events"
+      return msg.send "I don't think you're octospying to #{repo} #{event} events"
 
 
     if listeners.length == 0
@@ -186,28 +191,27 @@ module.exports = (robot) ->
           switch res.statusCode
             when 200
               delete events[event]
-              msg.send "Removed my subscription to #{repo} #{event} events"
+              msg.reply "You were the last. Removed my subscription to #{repo} #{event} events"
             else
               msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
 
   # Public: Subsribe to an event type for a repository
-  robot.respond /gh_hooks subscribe ([^ ]*) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
+  robot.respond /octospy add ([^ ]*) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
 
     # Convenience accessors with initialization
-    repos = robot.brain.data.gh_hooks[github_url] || = {}
+    repos = robot.brain.data.octospy[github_url] || = {}
     events = repos[repo] ||= {}
     listeners = events[event] ||= []
 
     add_listener = ->
-      if ! listeners.some((elem) ->
-        _.isEqual(elem,msg.message.user.id)
-      )
+      if ! _include(listeners, msg.message.user_ud)
         listeners.push msg.message.user.id
-
-      msg.send "Subscribed to #{repo} #{event} events on #{github_url}"
+        msg.reply "Octospying #{repo} #{event} events on #{github_url}"
+      else
+        msg.reply "You're already octospying that."
 
     # Check to see if we have any subscriptions to this event type for the repo
     if listeners.length == 0
@@ -217,37 +221,38 @@ module.exports = (robot) ->
             when 204
               add_listener()
             else
-              msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
+              msg.send "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
-      msg.send "I'm already listening to these. Adding you."
       add_listener()
 
 
   robot.brain.on 'loaded', =>
-    robot.brain.data.gh_hooks ||= {}
+    robot.brain.data.octospy ||= {}
 
 
-  robot.router.post '/hubot/gh_hooks/:github/:event', (req, res) ->
+  robot.router.post '/hubot/octospy/:github/:event', (req, res) ->
     req.body = req.body || {}
 
     return res.end "ok" unless req.body.repository # Not something we care about. Who does this?
 
     event = req.params.event
+
     repo_name =  (req.body.repository.owner.login || req.body.repository.owner.name) + "/" + req.body.repository.name
+    github_url = req.params.github
 
 
     context = _.extend req.body,
       repo: req.body.repository
       repo_name: repo_name
-      github_url: req.params.github
+      github_url: github_url
       branch: if req.body.ref
           req.body.ref.replace(/^refs\/heads\//,'')
         else
           undefined
 
-    message = renderTemplate(event,context)
+    message = '[octospy]' +  renderTemplate(event,context)
 
-    listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
+    listeners = robot.brain.data.octospy[github_url]?[repo_name][event] || []
 
     for listener in listeners when listener
       robot.send robot.userForId(listener), message.split("\n")...
