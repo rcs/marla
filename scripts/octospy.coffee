@@ -346,10 +346,10 @@ module.exports = (robot) ->
 
     robot.logger.debug JSON.stringify listeners
     robot.logger.debug JSON.stringify _.groupBy(listeners,'room')
-    robot.logger.debug JSON.stringify(room) for room of _.groupBy(listeners, 'room') when room
+    robot.logger.debug JSON.stringify(users) for room, users of _.groupBy(listeners, 'room') when room
 
     # group rooms together, so we don't spam with multiple people with subs
-    for room of _.groupBy(listeners, 'room') when room
-      robot.send room[0], message
+    for room, users of _.groupBy(listeners, 'room') when room
+      robot.send users[0], message
 
     res.end "ok"
