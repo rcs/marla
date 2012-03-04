@@ -351,4 +351,4 @@ module.exports = (robot) ->
     for room, users of _.groupBy(listeners, 'room') when ! room
       robot.send(user, message) for user in users
 
-    res.send()
+    res.end()
