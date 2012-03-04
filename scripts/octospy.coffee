@@ -15,6 +15,7 @@
 # Messagin on trying to watch a non-collab repo
 # Collapse multiple messages to people in the same room
 # Credentials for github.com and GitHub:FI
+# Collapse long commit lists down
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -157,11 +158,11 @@ module.exports = (robot) ->
     robot.brain.data.octospy ||= {}
 
   # Public: Announce the kinds of things octospy knows about
-  robot.respond /octospying/, (msg) ->
+  robot.respond /octospy events/, (msg) ->
     msg.reply "I know about " + ( event for event of views ).join(', ')
 
   # Public: Dump the watching hash
-  robot.respond /octospy watching/, (msg) ->
+  robot.respond /octospying/, (msg) ->
     watching = []
 
     # Troll octospy's data for any possible listeners, then see if they're us
