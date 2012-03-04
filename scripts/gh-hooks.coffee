@@ -163,6 +163,7 @@ module.exports = (robot) ->
       return msg.send "Can't find any subscriptions for #{repo} #{event} events"
 
     for i, listener in listeners
+      robot.logger.debug "Matching #{JSON.stringify listener} with #{msg.message.user}"
       if _.isEqual(listener,msg.message.user)
         removed = listeners.splice(i,1)
 
