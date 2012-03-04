@@ -221,7 +221,7 @@ module.exports = (robot) ->
 
     # Find the user in possible listeners
     for listener, i in listeners
-      if _.isEqual(listener,msg.message.user)
+      if _.isEqual(listener,msg.message.user.id)
         removed = listeners.splice(i,1)
 
     # Didn't find the user
@@ -263,8 +263,8 @@ module.exports = (robot) ->
     # Internal: Add a listener
     #
     # Closes around msg, repo, event, github_url
-    add_listener = ->
-      if ! _.include(listeners, msg.message.user_ud)
+    addListener = ->
+      if ! _.include(listeners, msg.message.user.id)
         listeners.push msg.message.user.id
         msg.reply "Octospying #{repo} #{event} events on #{github_url}"
       else
@@ -277,7 +277,7 @@ module.exports = (robot) ->
         (err,res,body) ->
           switch res.statusCode
             when 204
-              add_listener()
+              addListener()
             when 401
               msg.reply """
                 Failed to auth: #{JSON.stringify body}
@@ -290,7 +290,7 @@ module.exports = (robot) ->
             else
               msg.reply "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
     else
-      add_listener()
+      addListener()
 
 
 
