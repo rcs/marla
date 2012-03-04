@@ -286,7 +286,7 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the
     # repo, and if not, register the subscription
-    if ! listeners == 0
+    if ! listeners.length == 0
       pubsub_modify msg, 'subscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
           switch res.statusCode
