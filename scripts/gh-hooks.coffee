@@ -133,7 +133,6 @@ module.exports = (robot) ->
       return msg.send "I don't think you're subscribed to #{repo} #{event} events"
 
     if listeners.length == 0
-      msg.send "No listeners left, removing my subscription"
       data = QS.stringify {
         "hub.mode": 'unsubscribe',
         "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
@@ -157,8 +156,6 @@ module.exports = (robot) ->
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
 
-    msg.send "Subscribing to #{repo} #{event} events on #{github_url}"
-
     # Convenience accessors with initialization
     repos = robot.brain.data.gh_hooks[github_url] || = {}
     events = repos[repo] ||= {}
@@ -174,7 +171,6 @@ module.exports = (robot) ->
 
     # Check to see if we have any subscriptions to this event type for the repo
     if listeners.length == 0
-      msg.send "No previous listeners... listening"
       data = QS.stringify {
         "hub.mode": 'subscribe',
         "hub.topic": "https://#{github_url}/#{repo}/events/#{event}.json"
@@ -188,13 +184,12 @@ module.exports = (robot) ->
         .post(data) (err,res,body) ->
           switch res.statusCode
             when 204
-              msg.send "Adding you as a listener"
               add_listener()
             else
               robot.logger.debug "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
               msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
-      msg.send "I'm already listening to these. Adding you"
+      msg.send "I'm already listening to these. Adding you."
       add_listener()
 
 
