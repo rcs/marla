@@ -121,7 +121,7 @@ views =
       > {{{overflow comment.body 120}}}
     """
   pull_request: (context) ->
-    str = switch context.action
+    template = switch context.action
       when 'opened'
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
