@@ -100,15 +100,21 @@ pubsub_modify = (msg, action, target, cb) ->
 # Note: Handlebars likes to HTML escape things. It's kinda lame as a default. {{{ }}} to avoid it.
 views =
   push: (context) ->
-    if context.commits.length > 3
-      context.extra_commits = context.commits.length - 3
+    if context.created 
+      template = """
+        {{pusher.name}} created a new branch {{branch}} at {{repo_name}} {{compare}}
+      """
+    else
+      if context.commits.length > 3
+        context.extra_commits = context.commits.length - 3
 
-    context.short_commits = context.commits.slice(0,3)
-    template = """
-      {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-      {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{overflow message 40}}}
-      {{/each}}{{#if extra_commits }}  ... +{{extra_commits}} more{{/if}}
-    """
+      context.short_commits = context.commits.slice(0,3)
+      template = """
+        {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
+        {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{overflow message 40}}}
+        {{/each}}{{#if extra_commits }}  ... +{{extra_commits}} more{{/if}}
+      """
+
     template = Handlebars.compile(template)
     message = template(context)
   issues:
