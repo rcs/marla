@@ -22,16 +22,11 @@ Handlebars = require 'handlebars'
 # Private: Given a template name and a context, return the compiled template
 #
 # If the template in the views hash is a function, pass it the context to get the specific template
-renderTemplate = (template,context,robot) ->
-  robot.logger.debug "Rendering #{template}"
+renderTemplate = (template,context) ->
   if _.isFunction(views[template])
-    robot.logger.debug "Calling a function!"
     str = views[template](_.extend(context,{robot:robot}))
   else
-    robot.logger.debug "Rendering basic template"
     str = views[template]
-
-  robot.logger.debug "Template is : #{str}"
 
   template = Handlebars.compile(str)
   message = template(context)
@@ -59,11 +54,9 @@ views =
       {{{comment.body}}}
     """
   pull_request: (context) ->
-    context.robot.logger.debug "In pull request, going to render"
 
     switch context.action
       when 'opened'
-        context.robot.logger.debug "Opening"
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
           {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
@@ -210,7 +203,6 @@ module.exports = (robot) ->
             when 204
               add_listener()
             else
-              robot.logger.debug "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
               msg.send "Failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
     else
       msg.send "I'm already listening to these. Adding you."
