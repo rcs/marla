@@ -106,40 +106,40 @@ views =
     context.short_commits = context.commits.slice(0,3)
     template = """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-      {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{message}}}
+      {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{overflow message 40}}}
       {{/each}}{{#if extra_commits }}  ... +{{extra_commits}} more{{/if}}
     """
     template = Handlebars.compile(template)
     message = template(context)
   issues:
     """
-      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
+      {{sender.login}} {{action}} issue {{issue.number}} on {{repo_name}} "{{{overflow issue.title 25}}}" {{issue.html_url}}
     """
   issue_comment:
     """
-      {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
-      > {{{comment.body}}}
+      {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{overflow issue.title 25}}}" {{issue.html_url}}
+      > {{{overflow comment.body 120}}}
     """
   pull_request: (context) ->
     str = switch context.action
       when 'opened'
         """
-          {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+          {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
           {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
         """
       when 'closed'
         switch context.pull_request.merged
           when true
             """
-              {{sender.login}} merged pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+              {{sender.login}} merged pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
             """
           else
             """
-              {{sender.login}} closed pull requst {{number}} on {{repo_name}} without merging: "{{{pull_request.title}}}" {{pull_request.html_url}}
+              {{sender.login}} closed pull requst {{number}} on {{repo_name}} without merging: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
             """
       when 'synchronize'
         """
-          {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
+          {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
         """
     template = Handlebars.compile(template)
     message = template(context)
@@ -147,7 +147,7 @@ views =
   gollum:
     """
       {{#each pages}}
-        {{../sender.login}} {{action}} wiki page on {{repo_name}}: "{{{title}}}" {{html_url}}
+        {{../sender.login}} {{action}} wiki page on {{repo_name}}: "{{{overflow title 25}}}" {{html_url}}
       {{/each}}
     """
   watch:
@@ -156,7 +156,7 @@ views =
     """
   download:
     """
-      {{sender.login}} added a download to {{repo_name}}: {{{download.name}}} {{download.html_url}}
+      {{sender.login}} added a download to {{repo_name}}: {{{overflow download.name 25}}} {{download.html_url}}
     """
   fork:
     """
