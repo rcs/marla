@@ -28,6 +28,9 @@ _ = require 'underscore'
 QS = require 'querystring'
 Handlebars = require 'handlebars'
 
+Handlebars.registerHelper 'shortId', (id) ->
+  id.substring 0, 10
+
 # Internal: Given a template name and a context, return the compiled template.
 # Returns JSONed context if no template is found.
 #
@@ -97,7 +100,7 @@ views =
     context.short_commits = context.commits.slice(0,3)
     template = """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-      {{#each short_commits}}  {{author.username}}: {{id}} {{{message}}}
+      {{#each short_commits}}  {{author.username}}: {{short_id id}} {{{message}}}
       {{/each}}{{#if extra_commits }}... +{{extra_commits}} more{{/if}}
     """
     template = Handlebars.compile(template)
