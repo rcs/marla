@@ -183,14 +183,14 @@ module.exports = (robot) ->
         for event, listeners of repo
           if _.include(listeners, msg.message.user.id)
             watching.push
-              github: github_url
-              repo_name: repo
+              github_url: github_url
+              repo_name: repo_name
               event: event
 
     if watching.length > 0
       msg.reply (for sub in watching
-        "#{repo_name} #{event} events" + if github_url != 'github.com'
-            " on #{github_url}"
+        "#{sub.repo_name} #{sub.event} events" + if sub.github_url != 'github.com'
+            " on #{sub.github_url}"
           else
             ""
       ).join("\n")
