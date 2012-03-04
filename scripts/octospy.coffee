@@ -100,7 +100,7 @@ views =
     context.short_commits = context.commits.slice(0,3)
     template = """
       {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-      {{#each short_commits}}  {{author.username}}: {{short_id id}} {{{message}}}
+      {{#each short_commits}}  {{author.username}}: {{shortId id}} {{{message}}}
       {{/each}}{{#if extra_commits }}... +{{extra_commits}} more{{/if}}
     """
     template = Handlebars.compile(template)
