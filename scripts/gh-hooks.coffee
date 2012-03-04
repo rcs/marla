@@ -18,7 +18,7 @@ Handlebars = require 'handlebars'
 # Private: Given a template name and a context, return the compiled template
 #
 # If the template in the views hash is a function, pass it the context to get the specific template
-renderTemplate = (evetn,context) ->
+renderTemplate = (evenn,context) ->
   if views[event]
     if _.isFunction(views[event])
       str = views[event](context)
