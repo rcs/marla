@@ -199,7 +199,7 @@ module.exports = (robot) ->
             " on #{sub.github_url}"
           else
             ""
-      ).join("\n")
+      )
       robot.logger.debug JSON.stringify robot.brain.data.octospy
     else
       msg.reply "I don't think you're octospying anything"
