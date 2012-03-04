@@ -1,4 +1,4 @@
-# Octospy GitHub events.
+# Octospy GitHub events, watch what's happening with your projects
 # Powered by http://developer.github.com/v3/repos/hooks/
 #
 # octospy <repo> [event_type] - Start watching events for the repo, default push
@@ -9,17 +9,17 @@
 # Environment Variables:
 #
 # HUBOT_URL             : Where this hubot is mounted (ex "http//hubot.example.com"
-# HUBOT_GITHUB_USER     : The github user to use for the API
-# HUBOT_GITHUB_PASSWORD : The password to use for the API
+# HUBOT_GITHUB_USER     - The github user to use for the API
+# HUBOT_GITHUB_PASSWORD - The password to use for the API
 #  -- OR __
-# HUBOT_GITHUB_TOKEN
+# HUBOT_GITHUB_TOKEN    - GH OAuth2 Token, generate with: curl -u 'user:pass' https://api.github.com/authorizations -d '{"scopes":["repo"],"note":"Hubot Octospy"}'
 #
 
 # TODO:
 # add commit_comment support -- requires a round-trip to github to get the commit
 # Credentials for github.com and GitHub:FI
 # Collapse long commit lists down
-# Collapse multiple messages to people in the same room
+# Add middleware before bodyParser to check X-Hub-Signature
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -92,8 +92,8 @@ pubsub_modify = (msg, action, target, cb) ->
 # Note: Handlebars likes to HTML escape things. It's kinda lame as a default. {{{ }}} to avoid it.
 views =
   push: (context) ->
-    if commits.length > 3
-      commits.extra_commits = commits.length - 3
+    if context.commits.length > 3
+      context.commits.extra_commits = context.commits.length - 3
     end
     context.short_commits = context.commits.slice(0,3)
     template = Handlebars.compile """
