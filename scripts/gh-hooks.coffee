@@ -59,7 +59,7 @@ views =
     robot.logger.debug "Finding for pull request"
     robot.logger.debug JSON.stringify context
 
-    switch context.pull_request.action
+    return switch context.pull_request.action
       when 'opened'
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
