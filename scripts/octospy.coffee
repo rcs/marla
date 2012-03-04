@@ -11,6 +11,8 @@
 # HUBOT_URL             : Where this hubot is mounted (ex "http//hubot.example.com"
 # HUBOT_GITHUB_USER     : The github user to use for the API
 # HUBOT_GITHUB_PASSWORD : The password to use for the API
+#  -- OR __
+# HUBOT_GITHUB_TOKEN
 #
 
 # TODO:
@@ -18,6 +20,7 @@
 # Credentials for github.com and GitHub:FI
 # Collapse long commit lists down
 # Collapse multiple messages to people in the same room
+# Add GITHUB_TOKEN support
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -72,10 +75,17 @@ pubsub_modify = (msg, action, target, cb) ->
     "hub.callback": "#{process.env.HUBOT_URL}/hubot/octospy/#{github_url}/#{event}"
   }
 
+  # Check authentication, return error if it isn't specified
+  if process.env.HUBOT_GITHUB_TOKEN
+    auth = "token #{process.env.HUBOT_GITHUB_TOKEN}"
+  else if (process.env.HUBOT_GITHUB_USER and process.env.HUBOT_GITHUB_PASSWORD)
+    auth = 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64')
+  else
+    return cb({},{statusCode: 401}, {message: "Octospy doesn't have credentials"})
+
   msg.http("https://api.#{github_url}")
     .path('/hub')
-    # The .auth call in scoped-http-client wasn't working -- I was probably doing something wrong.
-    .header('Authorization', 'Basic ' + new Buffer("#{process.env.HUBOT_GITHUB_USER}:#{process.env.HUBOT_GITHUB_PASSWORD}").toString('base64'))
+    .header('Authorization', auth)
     .post(data) cb
 
 
@@ -267,11 +277,17 @@ module.exports = (robot) ->
           switch res.statusCode
             when 204
               add_listener()
+            when 401
+              msg.reply """
+                Specify credentials in the environment. (HUBOT_GITHUB_USERNAME,HUBOT_GITHUB_PASSWORD) or HUBOT_GITHUB_TOKEN"
+                To create a token: curl -u 'user:pass' https://api.github.com/authorizations -d '{"scopes":["repo"],"note":"Hubot Octospy"}'
+                #{JSON.stringify body}
+              """
             when 422
-              msg.reply "Either #{repo} doesn't exist, or #{process.env.HUBOT_GITHUB_USER} isn't a collaborator on it. Couldn't subscribe."
+              msg.reply "Either #{repo} doesn't exist, or my credentials don't make me a collaborator on it. Couldn't subscribe."
               robot.logger.debug "#{JSON.stringify body}"
             else
-              msg.reply "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode}"
+              msg.reply "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
     else
       add_listener()
 
