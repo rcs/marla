@@ -1,9 +1,11 @@
-# Subscribe to github events
-# Requires HUBOT_URL="...your_url..." to be set
+# Octospy GitHub events.
+#
+# Powered by http://developer.github.com/v3/repos/hooks/
+#
 #
 # Environment Variables:
 #
-# HUBOT_URL             : The place where this hubot is mounted (ex "http//hubot.example.com"
+# HUBOT_URL             : Where this hubot is mounted (ex "http//hubot.example.com"
 # HUBOT_GITHUB_USER     : The github user to use for the API
 # HUBOT_GITHUB_PASSWORD : The password to use for the API
 #
@@ -12,6 +14,7 @@
 # add commit_comment support -- requires a round-trip to github to get the commit
 # Messagin on trying to watch a non-collab repo
 # Collapse multiple messages to people in the same room
+# Credentials for github.com and GitHub:FI
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -154,7 +157,7 @@ module.exports = (robot) ->
     robot.brain.data.octospy ||= {}
 
   # Public: Announce the kinds of things octospy knows about
-  robot.respond /^octospying/, (msg) ->
+  robot.respond /octospying/, (msg) ->
     msg.reply "I know about " + ( event for event of views ).join(', ')
 
   # Public: Dump the watching hash
@@ -187,7 +190,7 @@ module.exports = (robot) ->
   # repo       - The repository name (ex. 'github/hubot'
   # event      - The event type to stop watching (default: 'push')
   # github_url - The base github URL (default: 'github.com'
-  robot.respond /^octospy stop ([^ ]+\/[^ ]+) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
+  robot.respond /octospy stop ([^ ]+\/[^ ]+) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
@@ -228,7 +231,7 @@ module.exports = (robot) ->
   # repo       - The repository name (ex. 'github/hubot'
   # event      - The event type to stop watching (default: 'push')
   # github_url - The base github URL (default: 'github.com'
-  robot.respond /^octospy add ([^ ]+\/[^ ]+) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
+  robot.respond /octospy ([^ ]+\/[^ ]+) ?([^ ]*)? ?([^ ]*)?/, (msg) ->
     repo = msg.match[1]
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
