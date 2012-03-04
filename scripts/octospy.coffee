@@ -1,7 +1,10 @@
 # Octospy GitHub events.
-#
 # Powered by http://developer.github.com/v3/repos/hooks/
 #
+# octospy <repo> [event_type] - Start watching events for the repo, default push
+# octospy stop <repo> [event_type] - Stop watching events for the repo
+# octospying - Show what you're spying on
+# octospy events - List the events you can watch
 #
 # Environment Variables:
 #
@@ -237,7 +240,7 @@ module.exports = (robot) ->
     github_url = msg.match[3] || 'github.com'
 
     # Don't go any further if we don't know about the event type
-    if ! _.include(( known for event of views ), event)
+    if ! _.include(( known for known of views ), event)
       return msg.reply "Sorry, I don't know about #{event} events"
 
     # Convenience accessors with initialization
