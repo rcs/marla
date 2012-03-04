@@ -288,8 +288,10 @@ module.exports = (robot) ->
     # Check to see if we have any subscriptions to this event type for the
     # repo, and if not, register the subscription
     if listeners.length == 0
+      robot.logger.debug "No listeners.."
       pubsub_modify msg, 'subscribe', { github_url: github_url, repo: repo, event: event },
         (err,res,body) ->
+          robot.logger.debug "Your mom in response"
           switch res.statusCode
             when 204
               addListener()
