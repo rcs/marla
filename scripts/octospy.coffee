@@ -12,10 +12,9 @@
 
 # TODO:
 # add commit_comment support -- requires a round-trip to github to get the commit
-# Messagin on trying to watch a non-collab repo
-# Collapse multiple messages to people in the same room
 # Credentials for github.com and GitHub:FI
 # Collapse long commit lists down
+# Collapse multiple messages to people in the same room
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -237,10 +236,14 @@ module.exports = (robot) ->
     event = msg.match[2] || 'push'
     github_url = msg.match[3] || 'github.com'
 
+    if ! _.include(( event for event of views ), event)
+      return msg.reply "Sorry, I don't know about #{event}"
+
     # Convenience accessors with initialization
     repos = robot.brain.data.octospy[github_url] || = {}
     events = repos[repo] ||= {}
     listeners = events[event] ||= []
+
 
     # Internal: Add a listener
     #
@@ -295,7 +298,7 @@ module.exports = (robot) ->
         else
           undefined
 
-    message = '[octospy]' +  renderTemplate(event,context)
+    message = '[octospy] ' +  renderTemplate(event,context)
 
     # Tell the people who care
     listeners = robot.brain.data.octospy[github_url]?[repo_name][event] || []
