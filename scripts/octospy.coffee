@@ -20,7 +20,6 @@
 # Credentials for github.com and GitHub:FI
 # Collapse long commit lists down
 # Collapse multiple messages to people in the same room
-# Add GITHUB_TOKEN support
 #
 # PIPEDREAM:
 # Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
@@ -342,8 +341,13 @@ module.exports = (robot) ->
     message = '[octospy] ' +  renderTemplate(event,context)
 
     # Tell the people who care
-    listeners = robot.brain.data.octospy[github_url]?[repo_name][event] || []
-    for listener in listeners when listener
+    listeners = robot.userFromId id for id in (robot.brain.data.octospy[github_url]?[repo_name][event] || [])
+
+    byRoom = _.groupBy(listeners, 'room')
+    for room of byRoom when room
+      robot.messageRoom room, message
+
+    for listener in byRoom[undefined]
       robot.send robot.userForId(listener), message.split("\n")...
 
     res.end "ok"
