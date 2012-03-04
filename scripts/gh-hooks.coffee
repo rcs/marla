@@ -24,7 +24,7 @@ Handlebars = require 'handlebars'
 # If the template in the views hash is a function, pass it the context to get the specific template
 renderTemplate = (template,context,robot) ->
   if _.isFunction(views[template])
-    str = views[template](context)
+    str = views[template](context,robot)
   else
     str = views[template]
 
@@ -41,7 +41,7 @@ EVENTS = ['push','issues']
 views =
   push:
     """
-      [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}"
+      [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}
       {{#each commits}}  {{author.username}}: {{id}} {{{message}}}
       {{/each}}
     """
@@ -54,9 +54,12 @@ views =
       {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
       {{{comment.body}}}
     """
-  pull_request: (context) ->
+  pull_request: (context,robot) ->
 
-    switch context.action
+    robot.logger.debug "Finding for pull request"
+    robot.logger.debug JSON.stringify context
+
+    switch context.pull_request.action
       when 'opened'
         """
           {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{pull_request.title}}}" {{pull_request.html_url}}
