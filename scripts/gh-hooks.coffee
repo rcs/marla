@@ -72,6 +72,10 @@ views =
     """
       {{sender.login}} added a download to {{repo_name}}: {{{download.name}}} {{download.html_url}}
     """
+  fork:
+    """
+      {{sender.login}} forked {{repo_name}} {{fork.html_url}}
+    """
 
 
 
