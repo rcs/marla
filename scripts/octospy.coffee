@@ -340,16 +340,15 @@ module.exports = (robot) ->
 
     message = '[octospy] ' +  renderTemplate(event,context)
 
-    robot.logger.debug JSON.stringify (robot.brain.data.octospy[github_url]?[repo_name][event] || [])
     # Tell the people who care
     listeners = (robot.userForId(id) for id in (robot.brain.data.octospy[github_url]?[repo_name][event] || []))
-
-    robot.logger.debug JSON.stringify listeners
-    robot.logger.debug JSON.stringify _.groupBy(listeners,'room')
-    robot.logger.debug JSON.stringify(users) for room, users of _.groupBy(listeners, 'room') when room
 
     # group rooms together, so we don't spam with multiple people with subs
     for room, users of _.groupBy(listeners, 'room') when room
       robot.send users[0], message
+
+    # For users without rooms, send individually
+    for room, users of _.groupBy(listeners, 'room') when ! room
+      robot.send(user, message) for user in users
 
     res.end "ok"
