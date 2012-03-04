@@ -8,12 +8,8 @@
 # HUBOT_GITHUB_PASSWORD : The password to use for the API
 #
 
-# TODO: 
+# TODO:
 # add commit_comment support -- requires a round-trip to github to get the commit
-# add pull_request support -- helpers necessary for opened/closed/synchronized display --- Sub templates? :-( (Not so bad, can switch on "action", thanks GH!")
-#
-# Add dynamic listeners -- register subscriptions if we get a post from a github postback
-#
 
 _ = require('underscore')
 QS = require 'querystring'
@@ -22,13 +18,17 @@ Handlebars = require 'handlebars'
 # Private: Given a template name and a context, return the compiled template
 #
 # If the template in the views hash is a function, pass it the context to get the specific template
-renderTemplate = (template,context,robot) ->
-  if _.isFunction(views[template])
-    str = views[template](context,robot)
+renderTemplate = (evetn,context) ->
+  if views[event]
+    if _.isFunction(views[event])
+      str = views[event](context)
+    else
+      str = views[event]
   else
-    str = views[template]
+    message = {}
+    message[event] = req.body
+    message = JSON.stringify message
 
-  robot.logger.debug str if robot
   template = Handlebars.compile(str)
   message = template(context)
 
@@ -41,7 +41,7 @@ EVENTS = ['push','issues']
 views =
   push:
     """
-      [{{repo_name}}] {{pusher.name}} pushed to {{branch}} {{compare}}
+      {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
       {{#each commits}}  {{author.username}}: {{id}} {{{message}}}
       {{/each}}
     """
@@ -54,10 +54,7 @@ views =
       {{sender.login}} commented on issue {{issue.number}} on {{repo_name}} "{{{issue.title}}}" {{issue.html_url}}
       {{{comment.body}}}
     """
-  pull_request: (context,robot) ->
-
-    robot.logger.debug "Finding for pull request"
-    robot.logger.debug JSON.stringify context
+  pull_request: (context) ->
 
     return switch context.action
       when 'opened'
@@ -226,21 +223,16 @@ module.exports = (robot) ->
     repo_name =  (req.body.repository.owner.login || req.body.repository.owner.name) + "/" + req.body.repository.name
 
 
-    if views[event]
-      context = _.extend req.body,
-        repo: req.body.repository
-        repo_name: repo_name
-        github_url: req.params.github
-        branch: if req.body.ref
-            req.body.ref.replace(/^refs\/heads\//,'')
-          else
-            undefined
-      message = renderTemplate(event,context,robot)
-    else
-      robot.logger.debug "Template not found for #{event}, pushing out raw"
-      message = {}
-      message[event] = req.body
-      message = JSON.stringify message
+    context = _.extend req.body,
+      repo: req.body.repository
+      repo_name: repo_name
+      github_url: req.params.github
+      branch: if req.body.ref
+          req.body.ref.replace(/^refs\/heads\//,'')
+        else
+          undefined
+
+    message = renderTemplate(event,context)
 
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
 
