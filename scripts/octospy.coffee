@@ -190,11 +190,11 @@ module.exports = (robot) ->
     if watching.length > 0
       msg.reply (for sub in watching
         "#{repo_name} #{event} events" + if github_url != 'github.com'
-            "on #{github_url}"
+            " on #{github_url}"
           else
             ""
       ).join("\n")
-      robot.logger.debug robot.brain.data.octospy
+      robot.logger.debug JSON.stringify robot.brain.data.octospy
     else
       msg.reply "I don't think you're octospying anything"
 
