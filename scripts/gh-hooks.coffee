@@ -230,6 +230,6 @@ module.exports = (robot) ->
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
 
     for listener in listeners when listener
-      robot.send robot.userForId listener, message.split("\n")...
+      robot.send robot.userForId(listener), message.split("\n")...
 
     res.end "ok"
