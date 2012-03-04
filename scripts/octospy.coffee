@@ -214,8 +214,6 @@ module.exports = (robot) ->
     events = repos[repo] ||= {}
     listeners = events[event] ||= []
 
-    msg.reply "Unoctospying #{repo} #{event} events on #{github_url}"
-
     if listeners.length == 0
       return msg.send "Can't find any octospies for #{repo} #{event} events"
 
@@ -227,6 +225,9 @@ module.exports = (robot) ->
     # Didn't find the user
     if ! removed
       return msg.send "I don't think you're octospying #{repo} #{event} events"
+    else
+      msg.reply "Unoctospied #{repo} #{event} events on #{github_url}"
+
 
 
     # If nobody's listening, we should unregister.
@@ -236,9 +237,9 @@ module.exports = (robot) ->
           switch res.statusCode
             when 204
               delete events[event]
-              msg.reply "You were the last. Removed my subscription to #{repo} #{event} events"
+              robot.logger.info "The last user unsubscribed. Removed my subscription to #{repo} #{event} events"
             else
-              msg.send "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
+              robot.logger.warning "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
 
   # Public: Subsribe to an event type for a repository
   #
@@ -286,9 +287,10 @@ module.exports = (robot) ->
               """
             when 422
               msg.reply "Either #{repo} doesn't exist, or my credentials don't make me a collaborator on it. Couldn't subscribe."
-              robot.logger.debug "#{JSON.stringify body}"
+              robot.logger.info "#{JSON.stringify body}"
             else
               msg.reply "I failed to subscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
+              robot.logger.warning "#{JSON.stringify body}"
     else
       addListener()
 
