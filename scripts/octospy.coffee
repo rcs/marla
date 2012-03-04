@@ -29,7 +29,7 @@ QS = require 'querystring'
 Handlebars = require 'handlebars'
 
 Handlebars.registerHelper 'shortId', (id) ->
-  id.substring 0, 10
+  id.substring 0, 7
 
 # Internal: Given a template name and a context, return the compiled template.
 # Returns JSONed context if no template is found.
