@@ -343,11 +343,8 @@ module.exports = (robot) ->
     # Tell the people who care
     listeners = robot.userFromId id for id in (robot.brain.data.octospy[github_url]?[repo_name][event] || [])
 
-    byRoom = _.groupBy(listeners, 'room')
-    for room of byRoom when room
-      robot.messageRoom room, message
-
-    for listener in byRoom[undefined]
-      robot.send robot.userForId(listener), message.split("\n")...
+    # group rooms together, so we don't spam with multiple people with subs
+    for room of _.groupBy(listeners, 'room') when room
+      robot.send room[0], message
 
     res.end "ok"
