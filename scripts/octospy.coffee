@@ -167,7 +167,7 @@ module.exports = (robot) ->
 
   # Internal: Initialize our brain
   robot.brain.on 'loaded', =>
-    robot.brain.data.octospy ||= {}
+    robot.brain.data.octospy = {}
 
   # Public: Announce the kinds of things octospy knows about
   robot.respond /octospy events/, (msg) ->
