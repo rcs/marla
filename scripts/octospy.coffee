@@ -210,7 +210,7 @@ module.exports = (robot) ->
     github_url = msg.match[3] || 'github.com'
 
     # Convenience accessor
-    listeners = robot.brain.data.octospy[github_url]?[repo]?[event]?
+    listeners = robot.brain.data.octospy[github_url]?[repo]?[event]
 
     if ! listeners
       return msg.send "Can't find any octospies for #{repo} #{event} events"
@@ -222,7 +222,7 @@ module.exports = (robot) ->
 
     # Didn't find the user
     if ! removed
-      return msg.send "I don't think you're octospying #{repo} #{event} events"
+      return msg.reply "I don't think you're octospying #{repo} #{event} events"
     else
       msg.reply "Unoctospied #{repo} #{event} events on #{github_url}"
 
