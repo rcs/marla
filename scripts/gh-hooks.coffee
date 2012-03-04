@@ -134,7 +134,7 @@ module.exports = (robot) ->
   robot.respond /gh_hooks subscriptions/, (msg) ->
     subscriptions = []
 
-    for url, github of robot.brain.data.gh_hooks
+    for github_url, github of robot.brain.data.gh_hooks
       for repo_name, repo of github
         for event, listeners of repo
           robot.logger.debug "Checking #{msg.message.user.id} against #{JSON.stringify listeners}"
@@ -146,7 +146,7 @@ module.exports = (robot) ->
 
     if subscriptions.length > 0
       msg.reply (for sub in subscriptions
-        "#{repo_name} #{event} events" + if github != 'github.com'
+        "#{repo_name} #{event} events" + if github_url != 'github.com'
             "on #{github}"
           else
             ""
