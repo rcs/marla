@@ -216,9 +216,8 @@ module.exports = (robot) ->
       return msg.send "Can't find any octospies for #{repo} #{event} events"
 
     # Find the user in possible listeners
-    for listener, i in listeners
-      if _.isEqual(listener,msg.message.user.id)
-        removed = listeners.splice(i,1)
+    for listener, i in listeners when listener == msg.message.user.id
+      removed = listeners.splice(i,1)
 
     # Didn't find the user
     if ! removed
@@ -228,27 +227,29 @@ module.exports = (robot) ->
 
 
 
-    # If nobody's listening, we should unregister.
-    if listeners.length == 0
-      pubsub_modify msg, 'unsubscribe', { github_url: github_url, repo: repo, event: event },
-        (err,res,body) ->
-          switch res.statusCode
-            when 204
-              data = robot.brain.data.octospy
-              repos = data[github_url]
-              events = repos[repo]
+    # We're done if nobody's left
+    return unless listeners.length == 0
 
-              delete events[event]
-              delete repos[repo] if (a for a of events).length == 0
-              delete data[github_url] if (a for a of repos).length == 0
+    # Otherwise we unsub
+    pubsub_modify msg, 'unsubscribe', { github_url: github_url, repo: repo, event: event },
+      (err,res,body) ->
+        switch res.statusCode
+          when 204
+            data = robot.brain.data.octospy
+            repos = data[github_url]
+            events = repos[repo]
 
-              # robot.brain.data.octospy = data
-              # Here to hook the redis magic
-              robot.brain.data.octospy[github_url][repo] = events
+            # Clean up after ourselves
+            delete events[event]
+            delete repos[repo] if (a for a of events).length == 0
+            delete data[github_url] if (a for a of repos).length == 0
 
-              robot.logger.info "The last user unsubscribed. Removed my subscription to #{repo} #{event} events"
-            else
-              robot.logger.warning "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
+            # Here to hook the redis magic
+            # robot.brain.data.octospy = data
+
+            robot.logger.info "The last user unsubscribed. Removed my subscription to #{repo} #{event} events"
+          else
+            robot.logger.warning "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
 
   # Public: Subsribe to an event type for a repository
   #
@@ -276,7 +277,8 @@ module.exports = (robot) ->
       events = repos[repo] ||= {}
       listeners = events[event] ||= []
 
-      if ! _.include(listeners, msg.message.user.id)
+      # See whether we're already listening
+      if (listener for listener in listeners when listener == msg.message.user.id).length == 0
         listeners.push msg.message.user.id
         msg.reply "Octospying #{repo} #{event} events on #{github_url}"
       else
