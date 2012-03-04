@@ -131,9 +131,6 @@ views =
 
 module.exports = (robot) ->
 
-  room_or_user = (user) ->
-
-
   # Public: Dump the subscriptions hash
   robot.respond /gh_hooks subscriptions/, (msg) ->
     msg.send JSON.stringify robot.brain.data.gh_hooks
@@ -207,7 +204,7 @@ module.exports = (robot) ->
 
 
   robot.brain.on 'loaded', =>
-    robot.brain.data.gh_hooks ||= {}
+    robot.brain.data.gh_hooks = {}
 
 
   robot.router.post '/hubot/gh_hooks/:github/:event', (req, res) ->
@@ -233,6 +230,6 @@ module.exports = (robot) ->
     listeners = robot.brain.data.gh_hooks[req.params.github]?[repo_name][event] || []
 
     for listener in listeners when listener
-      robot.send listener, message.split("\n")...
+      robot.send robot.userForId listener, message.split("\n")...
 
     res.end "ok"
