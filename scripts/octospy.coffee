@@ -28,8 +28,8 @@ _ = require 'underscore'
 QS = require 'querystring'
 Handlebars = require 'handlebars'
 
-Handlebars.registerHelper 'shortId', (id) ->
-  id.substring 0, 7
+Handlebars.registerHelper 'trim', (str, length) ->
+  str.substring 0, length
 
 # Internal: Given a template name and a context, return the compiled template.
 # Returns JSONed context if no template is found.
