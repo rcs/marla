@@ -237,6 +237,8 @@ module.exports = (robot) ->
           switch res.statusCode
             when 204
               delete events[event]
+              # Here to hook the redis magic
+              repos[repo] = events
               robot.logger.info "The last user unsubscribed. Removed my subscription to #{repo} #{event} events"
             else
               robot.logger.warning "Failed to unsubscribe to #{repo} #{event} events on #{github_url}: #{body} (Status Code: #{res.statusCode})"
