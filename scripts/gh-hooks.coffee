@@ -24,7 +24,7 @@ Handlebars = require 'handlebars'
 # If the template in the views hash is a function, pass it the context to get the specific template
 renderTemplate = (template,context) ->
   if _.isFunction(views[template])
-    str = views[template](_.extend(context,{robot:robot}))
+    str = views[template](context)
   else
     str = views[template]
 
