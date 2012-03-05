@@ -130,22 +130,22 @@ views =
     template = switch context.action
       when 'opened'
         """
-          {{sender.login}} {{action}} pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
+          {{sender.login}} {{action}} pull request {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
           {{pull_request.commits}} commits with {{pull_request.additions}} additions and {{pull_request.deletions}} deletions
         """
       when 'closed'
         switch context.pull_request.merged
           when true
             """
-              {{sender.login}} merged pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
+              {{sender.login}} merged pull request {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
             """
           else
             """
-              {{sender.login}} closed pull requst {{number}} on {{repo_name}} without merging: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
+              {{sender.login}} closed pull request {{number}} on {{repo_name}} without merging: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
             """
       when 'synchronize'
         """
-          {{sender.login}} updated pull requst {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
+          {{sender.login}} updated pull request {{number}} on {{repo_name}}: "{{{overflow pull_request.title 25}}}" {{pull_request.html_url}}
         """
     template = Handlebars.compile(template)
     message = template(context)
@@ -162,7 +162,7 @@ views =
     """
   download:
     """
-      {{sender.login}} added a download to {{repo_name}}: {{{overflow download.name 25}}} {{download.html_url}}
+      {{sender.login}} added a download to {{repo_name}}: "{{{overflow download.name 25}}}" {{download.html_url}}
     """
   fork:
     """
