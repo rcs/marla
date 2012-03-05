@@ -16,13 +16,9 @@
 #
 
 # TODO:
-# add commit_comment support -- requires a round-trip to github to get the commit
+# Add commit_comment support -- requires a round-trip to github to get the commit
 # Credentials for github.com and GitHub:FI
-# Collapse long commit lists down
 # Add middleware before bodyParser to check X-Hub-Signature
-#
-# PIPEDREAM:
-# Different templates for markdown/html/text interfaces (campfire/irc) (so we can have gravatars, named links)
 
 _ = require 'underscore'
 QS = require 'querystring'
