@@ -111,7 +111,7 @@ views =
       context.short_commits = context.commits.slice(0,3)
       template = """
         {{pusher.name}} pushed to {{branch}} at {{repo_name}} {{compare}}
-        {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{overflow message 40}}}
+        {{#each short_commits}}  {{author.username}}: {{trim id 7}} {{{overflow message 80}}}
         {{/each}}{{#if extra_commits }}  ... +{{extra_commits}} more{{/if}}
       """
 
